@@ -6,7 +6,13 @@
     },
     "bcb-br": {
       "command": "npx",
-      "args": ["-y", "bcb-br-mcp"]
+      "args": [
+        "-y",
+        "bcb-br-mcp"
+      ],
+      "env": {
+        "NODE_USE_ENV_PROXY": "1"
+      }
     }
   }
 }
