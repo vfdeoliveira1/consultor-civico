@@ -338,7 +338,8 @@ details.votos[open] > * + * { margin-top: .6rem; }
   var ed = document.getElementById("edicao");
   ed.appendChild(el("span", { class: "dado", text: "Edição " + (D.edicao || "") }));
   ed.appendChild(el("span", { text: "Publicado em " + dataBR(D.gerado_em, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) }));
-  if (D.arquivo_url) ed.appendChild(el("a", { href: D.arquivo_url, target: "_blank", rel: "noopener", text: "Edições anteriores →" }));
+  // No claude.ai o arquivo é outra página e abre em nova aba; no site é o endereço "/", na mesma aba.
+  if (D.arquivo_url) ed.appendChild(el("a", { href: D.arquivo_url, target: /^https?:/.test(D.arquivo_url) ? "_blank" : null, rel: "noopener", text: "Edições anteriores →" }));
 
   /* §1 Resumo */
   var s1 = secao("resumo", "O que importa nesta semana");

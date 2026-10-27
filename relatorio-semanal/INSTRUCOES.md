@@ -8,7 +8,8 @@ Para mudar o boletim, edite este arquivo. A tarefa agendada só manda ler e segu
 
 - **Leitor:** mora em Salvador (BA). Prioridade para o governo federal e o Congresso. Bahia e Salvador entram só em um resumo curto.
 - **Período:** a semana anterior, de segunda a domingo. O `coleta.py` calcula sozinho.
-- **Formato:** página publicada no claude.ai, com tabelas e gráficos, relatório completo.
+- **Formato:** página com tabelas e gráficos, relatório completo, publicada em dois lugares: no claude.ai e no site com login (branch `site`, servido pelo Cloudflare Pages; ver `site/LEIA-ME.md`). O claude.ai continua até o leitor dizer que o site basta.
+- **Endereço do site:** ainda não configurado. Quando o leitor informar, troque esta linha pelo endereço (ex.: `https://boletim.pages.dev`).
 
 ### Deputados acompanhados
 
@@ -69,10 +70,16 @@ Passe esses nomes também ao `coleta.py` (`--deputados`), para trazer votos e co
    node pdf.js /tmp/boletim/votos-AAAA-MM-DD.html /tmp/boletim/votos-AAAA-MM-DD.pdf
    ```
    Se o `votos.py` sair com código 3, a semana não teve votação nominal: não há PDF de votos, e isso vai na resposta final.
-10. **Envie os PDFs** ao leitor com a ferramenta `SendUserFile` (`status: "proactive"`, `display: "attach"`), numa única chamada com os dois arquivos e a legenda "Boletim Cívico e votos da semana, DD/MM a DD/MM". Se a ferramenta não estiver disponível, diga isso na resposta final.
-11. **Responda** com o link da página, o aviso de quais PDFs foram enviados e os destaques em 3 linhas. Essa mensagem vira a notificação no celular do leitor.
+10. **Publique no site:**
+   ```bash
+   python3 publicar.py --coletados /tmp/boletim/coletados.json --conteudo /tmp/boletim/conteudo.json \
+     --pdf /tmp/boletim/boletim-AAAA-MM-DD.pdf --votos-pdf /tmp/boletim/votos-AAAA-MM-DD.pdf
+   ```
+   Sem PDF de votos (código 3 no passo 9), omita `--votos-pdf`. O script abre o branch `site` numa pasta à parte, grava a edição em `edicoes/AAAA-MM-DD/`, atualiza o arquivo e faz commit e push só nesse branch. Se ele sair com código 4, o push foi recusado: a edição fica só no claude.ai, e isso vai na resposta final. Não mexa no branch `site` de outro jeito.
+11. **Envie os PDFs** ao leitor com a ferramenta `SendUserFile` (`status: "proactive"`, `display: "attach"`), numa única chamada com os dois arquivos e a legenda "Boletim Cívico e votos da semana, DD/MM a DD/MM". Se a ferramenta não estiver disponível, diga isso na resposta final.
+12. **Responda** com o link da página no claude.ai, o link da edição no site (endereço do site + `/edicoes/AAAA-MM-DD/`, se já estiver configurado; senão, diga só se a publicação no site deu certo), o aviso de quais PDFs foram enviados e os destaques em 3 linhas. Essa mensagem vira a notificação no celular do leitor.
 
-Não faça commit nem push dos boletins nem dos PDFs no repositório.
+Não faça commit nem push dos boletins nem dos PDFs no branch de trabalho nem no `main`. O único push permitido é o que o `publicar.py` faz no branch `site`.
 
 ## Seções e fontes
 

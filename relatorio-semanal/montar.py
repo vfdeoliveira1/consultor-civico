@@ -25,15 +25,8 @@ def reduzir(pontos, maximo=160):
     return amostra
 
 
-def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--coletados", required=True)
-    ap.add_argument("--conteudo", required=True)
-    ap.add_argument("--saida", required=True)
-    a = ap.parse_args()
-
-    coletados = json.load(open(a.coletados, encoding="utf-8"))
-    conteudo = json.load(open(a.conteudo, encoding="utf-8"))
+def montar(coletados, conteudo, arquivo_url=ARQUIVO_URL):
+    """Devolve (html, título) da página do boletim. O site usa arquivo_url="/"; o claude.ai, a página do arquivo."""
     for serie in coletados.get("economia", {}).get("series", {}).values():
         serie["pontos"] = reduzir(serie["pontos"])
 
@@ -43,7 +36,7 @@ def main():
     dados = {
         "edicao": f"{semana}/{ano}",
         "gerado_em": agora.isoformat(timespec="minutes"),
-        "arquivo_url": ARQUIVO_URL,
+        "arquivo_url": arquivo_url,
         "temas": json.load(open(os.path.join(AQUI, "temas.json"), encoding="utf-8"))["temas"],
         "coletados": coletados,
         "conteudo": conteudo,
@@ -52,7 +45,19 @@ def main():
     bruto = json.dumps(dados, ensure_ascii=False).replace("</", "<\\/")
     modelo = open(os.path.join(AQUI, "modelo.html"), encoding="utf-8").read()
     titulo = f"Boletim Cívico {agora:%d/%m/%Y}"
-    html = modelo.replace("{{TITULO}}", titulo).replace("{{DADOS}}", bruto)
+    return modelo.replace("{{TITULO}}", titulo).replace("{{DADOS}}", bruto), titulo
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--coletados", required=True)
+    ap.add_argument("--conteudo", required=True)
+    ap.add_argument("--saida", required=True)
+    a = ap.parse_args()
+
+    coletados = json.load(open(a.coletados, encoding="utf-8"))
+    conteudo = json.load(open(a.conteudo, encoding="utf-8"))
+    html, titulo = montar(coletados, conteudo)
     with open(a.saida, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"{a.saida}: {len(html) // 1024} KB, título \"{titulo}\"")
