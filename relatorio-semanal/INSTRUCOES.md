@@ -15,7 +15,7 @@ Para mudar o boletim, edite este arquivo. A tarefa agendada só manda ler e segu
 | Nome | Situação conhecida | O que acompanhar |
 |---|---|---|
 | **Sandro Filho** (PP-BA) | Eleito deputado federal em 4/10/2026, o mais jovem da história da Bahia. Toma posse na Câmara em 1º/02/2027. Até lá é vereador de Salvador. | Transição e articulação para o mandato (bancada, partido, comissões pretendidas), prestação de contas da campanha no TSE, atuação na Câmara Municipal de Salvador, declarações públicas relevantes. Depois da posse, incluir o nome em `--deputados` no `coleta.py`. |
-| **Paulo Câmara** | **A confirmar.** O leitor o citou como deputado federal eleito, mas a imprensa baiana (A Tarde, 5/10/2026) noticiou Paulo Câmara (PL-BA) **reeleito deputado estadual**, para o 3º mandato na Assembleia Legislativa da Bahia. Não há registro de Paulo Câmara entre os 39 federais eleitos pela Bahia. O ex-governador de Pernambuco Paulo Câmara (PSB) preside o Banco do Nordeste e não foi candidato. | Confirme o cargo no resultado do TSE e diga o que encontrou no próprio card. Até o leitor corrigir, trate como deputado estadual da Bahia: atuação na Assembleia, projetos, votações e declarações. |
+| **Paulo Câmara** (PL-BA) | Deputado estadual da Bahia, reeleito em 4/10/2026 para o 3º mandato na Assembleia Legislativa da Bahia (Alba). Confirmado pelo leitor. Não confundir com o ex-governador de Pernambuco Paulo Câmara (PSB), que preside o Banco do Nordeste. | Atuação na Assembleia (projetos, votações, comissões, discursos), declarações públicas relevantes e posições sobre temas federais. Fontes: site da Alba (`www.al.ba.gov.br`), imprensa baiana, busca na web. A cota parlamentar federal não se aplica. |
 
 Quando o leitor mudar esta lista, siga a versão nova.
 
