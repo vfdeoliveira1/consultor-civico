@@ -47,9 +47,15 @@ Passe esses nomes também ao `coleta.py` (`--deputados`), para trazer votos e co
    ```
 6. **Confira a página uma vez** com o Playwright pré-instalado: abra o HTML, veja se não há erro no console e se as seções aparecem. Não altere o `modelo.html` na sessão semanal. Se algo estiver quebrado, conserte o `conteudo.json`.
 7. **Publique.** Carregue o skill `artifact-design` (a ferramenta exige) e publique o HTML com a ferramenta Artifact, como página nova, com `icon: "news"` e uma `description` de uma frase com os 2 ou 3 assuntos principais. Não reescreva o design: o modelo já segue o contrato da página.
-8. **Responda** com o link da página e os destaques em 3 linhas. Essa mensagem vira a notificação no celular do leitor.
+8. **Gere o PDF** do mesmo HTML:
+   ```bash
+   node pdf.js /tmp/boletim/boletim-AAAA-MM-DD.html /tmp/boletim/boletim-AAAA-MM-DD.pdf
+   ```
+   O script imprime o tamanho e o número de seções. Se ele sair com erro, conserte o `conteudo.json` e gere de novo.
+9. **Envie o PDF** ao leitor com a ferramenta `SendUserFile` (`status: "proactive"`, `display: "attach"`), com a legenda "Boletim Cívico, semana de DD/MM a DD/MM". Se a ferramenta não estiver disponível, diga isso na resposta final.
+10. **Responda** com o link da página, o aviso de que o PDF foi enviado e os destaques em 3 linhas. Essa mensagem vira a notificação no celular do leitor.
 
-Não faça commit nem push dos boletins no repositório.
+Não faça commit nem push dos boletins nem dos PDFs no repositório.
 
 ## Seções e fontes
 
@@ -63,7 +69,7 @@ Não faça commit nem push dos boletins no repositório.
 | **Governo federal** (`executivo`) | Decretos e portarias relevantes, anúncios de programas, decisões de ministérios, transição de governo (até as posses de 2027). | Diário Oficial, busca na web, Portal da Transparência (com a chave `PORTAL_TRANSPARENCIA_API_KEY`, quando houver). |
 | **Justiça** (`justica`) | Julgamentos do STF e do STJ com efeito geral: repercussão geral, ações de controle de constitucionalidade, súmulas novas. | `portal.stf.jus.br`, pasta `jurisprudencia/` do acervo, busca na web. DataJud só para processos específicos. |
 | **Bahia e Salvador** (`bahia`) | No máximo 3 itens: o que tiver efeito sobre o leitor ou ligação com o governo federal. | Busca na web, Querido Diário (`api.queridodiario.ok.org.br`). |
-| **Agenda** (`agenda`) | A pauta do plenário da Câmara vem do `coleta.py`. Acrescente Senado, Copom, divulgações do IBGE, julgamentos marcados no STF e prazos de MPs. | MCP `senado-br`, calendários do Banco Central e do IBGE, pauta do STF. |
+| **Agenda** (`agenda`) | A pauta do plenário da Câmara vem do `coleta.py` e entra sozinha: não a repita no `conteudo.json`. Acrescente Senado, Copom, divulgações do IBGE, julgamentos marcados no STF e prazos de MPs. | MCP `senado-br`, calendários do Banco Central e do IBGE, pauta do STF. |
 | **Para entender** (`tema_da_semana`) | 3 a 5 parágrafos didáticos sobre o assunto mais discutido: o que é, o que diz a lei (com artigo e arquivo do acervo), quais são os argumentos. | Acervo local e as fontes da semana. |
 
 ## Regras de redação
