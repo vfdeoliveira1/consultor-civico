@@ -24,7 +24,7 @@ A página abre com os botões dos tópicos. Cada botão mostra um tópico, e no 
 
 | Tópico | Conteúdo |
 |---|---|
-| O que importa nesta semana | 4 a 6 destaques e a tabela "Em relação à semana anterior": meta Selic, dólar, projeções do Focus, votações no plenário e proposições apresentadas, nas duas semanas. |
+| O que importa nesta semana | "Seus temas nesta semana" (o que apareceu sobre cada tema de `temas.json`), 4 a 6 destaques e a tabela "Em relação à semana anterior": meta Selic, dólar, projeções do Focus, votações no plenário e proposições apresentadas, nas duas semanas. |
 | Economia | Selic, IPCA, dólar, desemprego, juros ao consumidor e dívida pública, com gráficos, mais as projeções do boletim Focus e uma análise. |
 | Congresso e leis | Leis e PECs da semana, comparadas com o texto anterior no acervo, e cada votação nominal da Câmara e do Senado com placar, orientação dos partidos e votos por partido e por parlamentar. |
 | Consultar um parlamentar | Busca por nome de qualquer deputado federal ou senador em exercício: votos nas votações nominais (com aviso de voto contra o partido), discursos, proposições apresentadas e cota parlamentar da semana. |
@@ -66,6 +66,7 @@ O passo a passo completo e as regras de redação estão em [`relatorio-semanal/
 | `pdf.js` | Gera o PDF do boletim (A4, tema claro, todos os tópicos em sequência). |
 | `votos.py` | Monta o PDF "Votos da semana": todos os deputados e senadores em ordem alfabética, com o voto em cada votação nominal, para consultar com a busca do leitor de PDF. |
 | `exemplo.json` | Formato do conteúdo semanal, com textos de exemplo. |
+| `temas.json` | Temas que o leitor acompanha e as palavras-chave de cada um. Edite este arquivo para mudar os temas. |
 | `arquivo.html` | Página fixa com todas as edições, publicada em https://claude.ai/artifact/XQdiMS4ZgKSMxFEKSv8Q5U. Ela lê a lista do próprio banco de dados, e a sessão semanal só acrescenta a edição nova. |
 
 Para gerar um boletim à mão, para uma semana específica:

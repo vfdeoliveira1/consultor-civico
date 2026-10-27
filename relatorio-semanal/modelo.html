@@ -141,6 +141,12 @@ td.n, th.n { text-align: right; font-family: var(--f-dado); font-variant-numeric
 .rodape { font-size: .85rem; color: var(--tinta-2); border-top: 1px solid var(--linha); padding-top: 1rem; display: flex; flex-direction: column; gap: .4rem; }
 .vazio { color: var(--tinta-2); font-style: italic; }
 .so-impressao { display: none; }
+.temas { display: flex; flex-direction: column; gap: .5rem; }
+details.tema-item { background: var(--folha); border: 1px solid var(--linha); border-radius: var(--raio); padding: .55rem .9rem; }
+details.tema-item > summary { cursor: pointer; font-family: var(--f-titulo); font-size: .98rem; }
+details.tema-item[data-vazio] > summary { cursor: default; color: var(--tinta-2); }
+details.tema-item[open] > ul { margin-top: .6rem; }
+
 details.capital { background: var(--folha); border: 1px solid var(--linha); border-radius: var(--raio); padding: .6rem .9rem; display: flex; flex-direction: column; gap: .6rem; }
 details.capital > summary { cursor: pointer; font-family: var(--f-titulo); font-size: .98rem; }
 details.capital[open] > * + * { margin-top: .6rem; }
@@ -336,6 +342,52 @@ details.votos[open] > * + * { margin-top: .6rem; }
 
   /* §1 Resumo */
   var s1 = secao("resumo", "O que importa nesta semana");
+
+  /* Seus temas: o que a semana teve sobre os assuntos de temas.json, em todas as fontes do boletim */
+  (function () {
+    var TEMAS = D.temas || [];
+    if (!TEMAS.length) return;
+    var norm = function (t) { return String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); };
+    var esc = function (t) { return t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); };
+    var regras = TEMAS.map(function (t) {
+      var partes = t.palavras.map(function (p) { var n = esc(norm(p)); return n.replace(/\\/g, "").length <= 4 ? "\\b" + n + "\\b" : "\\b" + n; });
+      return { nome: t.nome, re: new RegExp(partes.join("|")) };
+    });
+    var PRINCIPAIS = { PL: 1, PLP: 1, PEC: 1, MPV: 1, PDL: 1, PLV: 1, PRS: 1 };
+    var itensFonte = [];
+    function add(tipo, titulo, texto, url, interno) { itensFonte.push({ tipo: tipo, titulo: titulo, texto: texto || "", url: url, interno: interno, busca: norm(titulo + " " + (texto || "")) }); }
+    // Primeiro o que o boletim já destacou, depois os dados de cada fonte
+    var grupos = [["leis", "congresso"], [(C.congresso || {}).itens, "congresso"], [C.justica, "justica"], [C.bahia, "bahia"], [C.executivo, "presidente"], [(C.economia || {}).fatos, "economia"]];
+    var P = C.presidente || {};
+    ["sancoes", "vetos", "mps", "decretos", "agenda"].forEach(function (g) { grupos.push([P[g], "presidente"]); });
+    grupos.forEach(function (g) { var lista = g[0] === "leis" ? C.leis : g[0]; (lista || []).forEach(function (it) { add("No boletim", it.titulo, it.texto, null, g[1]); }); });
+    var Kc = K.camara || {}, Ks = K.senado || {}, At = K.atividade || {};
+    var vistas = {};
+    (Kc.votacoes || []).forEach(function (v) { if (!v.proposicao || vistas[v.proposicao.sigla]) return; vistas[v.proposicao.sigla] = 1; add("Votação na Câmara", v.proposicao.sigla + (v.aprovacao === 1 ? " · aprovada" : v.aprovacao === 0 ? " · rejeitada" : ""), v.proposicao.ementa, null, "congresso"); });
+    (Ks.votacoes || []).forEach(function (v) { if (vistas["S" + v.materia]) return; vistas["S" + v.materia] = 1; add("Votação no Senado", v.materia + (v.resultado ? " · " + v.resultado.toLowerCase() : ""), v.ementa, null, "congresso"); });
+    ((At.camara || {}).proposicoes || []).forEach(function (p) { if (PRINCIPAIS[p[0]]) add("Proposta nova na Câmara", p[0] + " " + p[1] + "/" + p[2], p[4], p[5]); });
+    ((At.senado || {}).materias || []).forEach(function (p) { if (PRINCIPAIS[p[0]]) add("Proposta nova no Senado", p[0] + " " + p[1] + "/" + p[2], p[4], p[5]); });
+    ((K.capitais || {}).camaras || []).forEach(function (c) { c.projetos.forEach(function (p) { add("Câmara de " + c.cidade, p.tipo + " nº " + p.numero + "/" + p.ano, p.ementa, p.url); }); });
+
+    var achados = regras.map(function (r) { return { nome: r.nome, itens: itensFonte.filter(function (it) { return r.re.test(it.busca); }) }; });
+    var bloco = el("div", { class: "temas" }, [el("h3", { text: "Seus temas nesta semana" })]);
+    achados.forEach(function (a) {
+      var det = el("details", { class: "tema-item" });
+      det.appendChild(el("summary", null, [el("strong", { text: a.nome }), el("span", { class: "nota", text: " · " + (a.itens.length ? a.itens.length + (a.itens.length === 1 ? " item" : " itens") : "nada nesta semana") })]));
+      if (a.itens.length) {
+        det.appendChild(el("ul", { class: "lista-atividade" }, a.itens.slice(0, 12).map(function (it) {
+          var tit = it.url ? el("a", { href: it.url, target: "_blank", rel: "noopener", text: it.titulo }) : it.interno ? el("a", { href: "#" + it.interno, text: it.titulo }) : el("strong", { text: it.titulo });
+          return el("li", null, [el("span", { class: "rotulo", text: it.tipo + " " }), tit, it.texto ? el("div", { class: "nota", text: it.texto.length > 200 ? it.texto.slice(0, 200) + "…" : it.texto }) : null]);
+        })));
+        if (a.itens.length > 12) det.appendChild(el("p", { class: "nota", text: "Mais " + (a.itens.length - 12) + " itens sobre o tema nas seções do boletim." }));
+      }
+      if (!a.itens.length) det.setAttribute("data-vazio", "1");
+      bloco.appendChild(det);
+    });
+    bloco.appendChild(el("p", { class: "nota", text: "Busca por palavras-chave em votações, propostas novas da Câmara e do Senado (projetos de lei, PECs e medidas provisórias), projetos das câmaras das capitais e notícias do boletim. Um item pode aparecer em mais de um tema. Os temas ficam no arquivo temas.json do repositório." }));
+    s1.appendChild(bloco);
+  })();
+
   var ol = el("ol", { class: "destaques" });
   (C.destaques || []).forEach(function (d) {
     var txt = typeof d === "string" ? { texto: d } : d;

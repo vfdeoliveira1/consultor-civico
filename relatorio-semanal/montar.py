@@ -44,6 +44,7 @@ def main():
         "edicao": f"{semana}/{ano}",
         "gerado_em": agora.isoformat(timespec="minutes"),
         "arquivo_url": ARQUIVO_URL,
+        "temas": json.load(open(os.path.join(AQUI, "temas.json"), encoding="utf-8"))["temas"],
         "coletados": coletados,
         "conteudo": conteudo,
     }
