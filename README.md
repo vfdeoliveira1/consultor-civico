@@ -27,7 +27,7 @@ A página abre com os botões dos tópicos. Cada botão mostra um tópico, e no 
 | O que importa nesta semana | 4 a 6 destaques. |
 | Economia | Selic, IPCA, dólar, desemprego, juros ao consumidor e dívida pública, com gráficos, mais as projeções do boletim Focus e uma análise. |
 | Congresso e leis | Leis e PECs da semana, comparadas com o texto anterior no acervo, e cada votação nominal da Câmara e do Senado com placar, orientação dos partidos e votos por partido e por parlamentar. |
-| Como votou cada parlamentar | Busca por nome: o voto de qualquer deputado ou senador nas votações nominais da semana, com aviso de voto contra o partido. |
+| Consultar um parlamentar | Busca por nome de qualquer deputado federal ou senador em exercício: votos nas votações nominais (com aviso de voto contra o partido), discursos, proposições apresentadas e cota parlamentar da semana, mais um botão "Resumir com IA" que pede ao Claude um resumo neutro feito só com esses dados. |
 | Deputados que você acompanha | Sandro Filho (PP-BA) e Paulo Câmara (PL-BA), com fatos verificáveis e gastos da cota parlamentar. |
 | Deputados em evidência | Os mais citados na imprensa de linhas editoriais diferentes, mais o ranking da cota parlamentar. |
 | Presidente e governo federal | Sanções, vetos, medidas provisórias, decretos, agenda e vetos à espera do Congresso. |
@@ -47,7 +47,7 @@ Uma tarefa agendada no claude.ai roda **toda segunda-feira às 7h39** (horário 
 2. pesquisa a semana anterior e escolhe os deputados em evidência;
 3. roda `relatorio-semanal/coleta.py`, que busca os dados estruturados;
 4. escreve o conteúdo da semana num `conteudo.json`, no formato de `relatorio-semanal/exemplo.json`;
-5. monta a página com `montar.py` e a publica como página privada no claude.ai;
+5. monta a página com `montar.py` e a publica como página privada no claude.ai, com a capacidade `sample`, que faz funcionar o botão "Resumir com IA";
 6. gera os PDFs com `pdf.js` e `votos.py` e os envia ao leitor, com notificação no celular.
 
 O passo a passo completo e as regras de redação estão em [`relatorio-semanal/INSTRUCOES.md`](relatorio-semanal/INSTRUCOES.md). **Para mudar o boletim** (deputados acompanhados, seções, fontes, tom), edite esse arquivo: a tarefa agendada só manda segui-lo.
@@ -58,6 +58,7 @@ O passo a passo completo e as regras de redação estão em [`relatorio-semanal/
 |---|---|
 | `INSTRUCOES.md` | Configuração e passo a passo da sessão semanal. |
 | `coleta.py` | Coleta os dados de cada fonte, de forma independente: uma fonte que falha vira aviso e as demais seguem. Fontes: séries do Banco Central e o Focus; votações, votos e agenda do plenário da Câmara; votações, votos e vetos do Senado, pelo servidor MCP `senado-br`; e cota parlamentar, pelo arquivo anual da Câmara, porque a API de despesas vem vazia. |
+| `atividade.py` | Discursos, proposições apresentadas e, no Senado, cota do ano de todos os deputados e senadores em exercício, para a consulta por parlamentar. |
 | `capitais.py` | Projetos de lei e leis das câmaras das capitais. Traz a lista das câmaras cobertas e das que ficaram de fora, com o motivo. |
 | `montar.py` | Junta os dados coletados e o conteúdo redigido no `modelo.html`. |
 | `modelo.html` | A página do boletim: tabelas, gráficos em SVG, temas claro e escuro, layout de celular e navegação por tópicos. |
