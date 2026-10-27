@@ -52,8 +52,14 @@ Passe esses nomes também ao `coleta.py` (`--deputados`), para trazer votos e co
    node pdf.js /tmp/boletim/boletim-AAAA-MM-DD.html /tmp/boletim/boletim-AAAA-MM-DD.pdf
    ```
    O script imprime o tamanho e o número de seções. Se ele sair com erro, conserte o `conteudo.json` e gere de novo.
-9. **Envie o PDF** ao leitor com a ferramenta `SendUserFile` (`status: "proactive"`, `display: "attach"`), com a legenda "Boletim Cívico, semana de DD/MM a DD/MM". Se a ferramenta não estiver disponível, diga isso na resposta final.
-10. **Responda** com o link da página, o aviso de que o PDF foi enviado e os destaques em 3 linhas. Essa mensagem vira a notificação no celular do leitor.
+   Gere também o PDF separado **Votos da semana**, com o voto de cada deputado e senador:
+   ```bash
+   python3 votos.py --coletados /tmp/boletim/coletados.json --saida /tmp/boletim/votos-AAAA-MM-DD.html
+   node pdf.js /tmp/boletim/votos-AAAA-MM-DD.html /tmp/boletim/votos-AAAA-MM-DD.pdf
+   ```
+   Se o `votos.py` sair com código 3, a semana não teve votação nominal: não há PDF de votos, e isso vai na resposta final.
+9. **Envie os PDFs** ao leitor com a ferramenta `SendUserFile` (`status: "proactive"`, `display: "attach"`), numa única chamada com os dois arquivos e a legenda "Boletim Cívico e votos da semana, DD/MM a DD/MM". Se a ferramenta não estiver disponível, diga isso na resposta final.
+10. **Responda** com o link da página, o aviso de quais PDFs foram enviados e os destaques em 3 linhas. Essa mensagem vira a notificação no celular do leitor.
 
 Não faça commit nem push dos boletins nem dos PDFs no repositório.
 
