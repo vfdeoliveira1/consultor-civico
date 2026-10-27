@@ -1,0 +1,467 @@
+<title>{{TITULO}}</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..650;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: coluna de leitura única, como um boletim oficial; cabeçalho de seção com nº de parágrafo (§), dados em mono. */
+:root {
+  --papel: #f5f6f3;
+  --folha: #ffffff;
+  --tinta: #17211f;
+  --tinta-2: #4b5855;
+  --linha: #d9dedb;
+  --acento: #0e6655;
+  --acento-suave: #e1efeb;
+  --ocre: #9a6412;
+  --bom: #1f7a3d;
+  --atencao: #a3461c;
+  --neutro: #55627a;
+  --f-titulo: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-texto: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-dado: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --raio: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papel: #0f1514; --folha: #161e1c; --tinta: #e4ebe8; --tinta-2: #9fb0ab; --linha: #2a3532;
+    --acento: #5cc7ad; --acento-suave: #1b2f2a; --ocre: #e0a54a; --bom: #6fcf8e; --atencao: #f08a5d; --neutro: #9aa8c4;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --papel: #0f1514; --folha: #161e1c; --tinta: #e4ebe8; --tinta-2: #9fb0ab; --linha: #2a3532;
+  --acento: #5cc7ad; --acento-suave: #1b2f2a; --ocre: #e0a54a; --bom: #6fcf8e; --atencao: #f08a5d; --neutro: #9aa8c4;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--papel); color: var(--tinta);
+  font-family: var(--f-texto); font-size: 1.05rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+.coluna { max-width: 46rem; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 3rem; }
+/* Itens de flex encolhem; sem isso uma tabela larga alarga a página inteira. */
+.coluna > *, section > * { min-width: 0; }
+a { color: var(--acento); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-titulo); text-wrap: balance; margin: 0; line-height: 1.15; }
+p { margin: 0; }
+.dado, .num { font-family: var(--f-dado); font-variant-numeric: tabular-nums; }
+.rotulo { font-family: var(--f-titulo); font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-2); }
+
+/* Cabeçalho */
+.cabecalho { padding-block: 2.5rem 1.5rem; border-bottom: 3px double var(--tinta); display: flex; flex-direction: column; gap: .6rem; }
+.cabecalho h1 { font-size: clamp(2.2rem, 7vw, 3.4rem); font-weight: 800; font-stretch: 80%; letter-spacing: -.01em; }
+.cabecalho .linha-edicao { display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; color: var(--tinta-2); font-size: .95rem; }
+.sumario { display: flex; flex-wrap: wrap; gap: .4rem .5rem; padding-top: .5rem; }
+.sumario a { font-family: var(--f-titulo); font-size: .82rem; font-weight: 600; text-decoration: none; color: var(--tinta); border: 1px solid var(--linha); border-radius: 999px; padding: .2rem .7rem; background: var(--folha); }
+.sumario a:hover { border-color: var(--acento); color: var(--acento); }
+
+/* Seções */
+section { display: flex; flex-direction: column; gap: 1.25rem; scroll-margin-top: 1rem; }
+.secao-topo { display: flex; align-items: baseline; gap: .75rem; border-bottom: 1px solid var(--linha); padding-bottom: .5rem; }
+.secao-topo .par { font-family: var(--f-dado); color: var(--acento); font-size: .95rem; }
+.secao-topo h2 { font-size: 1.55rem; font-weight: 700; font-stretch: 88%; }
+.intro { color: var(--tinta-2); }
+h3 { font-size: 1.12rem; font-weight: 700; font-stretch: 92%; }
+
+/* Destaques */
+.destaques { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .9rem; counter-reset: d; }
+.destaques li { display: grid; grid-template-columns: 2rem 1fr; gap: .5rem; }
+.destaques li::before { counter-increment: d; content: counter(d); font-family: var(--f-titulo); font-weight: 800; font-size: 1.4rem; color: var(--acento); line-height: 1.2; }
+.destaques li > div { min-width: 0; }
+
+/* Indicadores */
+.indicadores { display: grid; grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr)); gap: .75rem; }
+.ind { background: var(--folha); border: 1px solid var(--linha); border-radius: var(--raio); padding: .8rem .9rem; display: flex; flex-direction: column; gap: .2rem; min-width: 0; }
+.ind .valor { font-family: var(--f-dado); font-size: 1.5rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.ind .valor small { font-size: .8rem; color: var(--tinta-2); }
+.ind .var { font-family: var(--f-dado); font-size: .78rem; color: var(--tinta-2); }
+.ind .ref { font-size: .78rem; color: var(--tinta-2); }
+.ind svg { width: 100%; height: 34px; display: block; }
+
+/* Gráficos */
+.grafico { background: var(--folha); border: 1px solid var(--linha); border-radius: var(--raio); padding: 1rem; display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
+.grafico svg { width: 100%; height: auto; display: block; overflow: visible; }
+.grafico .legenda { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .85rem; color: var(--tinta-2); }
+.grafico .legenda span::before { content: ""; display: inline-block; width: .9rem; height: 3px; vertical-align: middle; margin-right: .35rem; background: var(--cor); border-radius: 2px; }
+.nota { font-size: .82rem; color: var(--tinta-2); }
+
+/* Tabelas */
+.tabela { overflow-x: auto; border: 1px solid var(--linha); border-radius: var(--raio); background: var(--folha); }
+table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+th, td { text-align: left; padding: .55rem .7rem; border-bottom: 1px solid var(--linha); vertical-align: top; }
+th { font-family: var(--f-titulo); font-size: .74rem; letter-spacing: .06em; text-transform: uppercase; color: var(--tinta-2); font-weight: 600; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td.n, th.n { text-align: right; font-family: var(--f-dado); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Selos */
+.selo { display: inline-block; font-family: var(--f-titulo); font-size: .7rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: .1rem .45rem; border-radius: 3px; border: 1px solid currentColor; white-space: nowrap; }
+.selo.bom { color: var(--bom); } .selo.atencao { color: var(--atencao); } .selo.neutro { color: var(--neutro); } .selo.ocre { color: var(--ocre); }
+
+/* Itens de notícia e lei */
+.itens { display: flex; flex-direction: column; gap: 1.1rem; }
+.item { display: flex; flex-direction: column; gap: .35rem; padding-left: .9rem; border-left: 2px solid var(--linha); }
+.item .meta { display: flex; flex-wrap: wrap; gap: .4rem .6rem; align-items: center; font-size: .85rem; color: var(--tinta-2); }
+.fontes { font-size: .82rem; color: var(--tinta-2); }
+.fontes a { margin-right: .6rem; }
+
+/* Deputados */
+.deputado { background: var(--folha); border: 1px solid var(--linha); border-radius: var(--raio); padding: 1.1rem; display: flex; flex-direction: column; gap: .9rem; }
+.deputado .topo { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .4rem 1rem; align-items: baseline; }
+.deputado .cargo { font-size: .9rem; color: var(--tinta-2); }
+.fatos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .6rem; }
+.fatos li { display: grid; grid-template-columns: 7.5rem 1fr; gap: .6rem; align-items: start; }
+.fatos li > div { min-width: 0; }
+.lados { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .75rem; }
+.lados > div { background: var(--acento-suave); border-radius: var(--raio); padding: .7rem .8rem; font-size: .95rem; min-width: 0; }
+.barras { display: flex; flex-direction: column; gap: .35rem; }
+.barra { display: grid; grid-template-columns: minmax(0, 1fr) 6.5rem; gap: .5rem; font-size: .85rem; align-items: center; }
+.barra .trilho { grid-column: 1 / -1; height: 6px; background: var(--linha); border-radius: 3px; overflow: hidden; }
+.barra .trilho i { display: block; height: 100%; background: var(--acento); }
+
+/* Tema da semana */
+.tema { background: var(--acento-suave); border-radius: var(--raio); padding: 1.25rem; display: flex; flex-direction: column; gap: .75rem; }
+.tema p { max-width: 65ch; }
+
+/* Avisos e fontes podem trazer URLs longas, sem espaço para quebrar. */
+.avisos, .fontes, .item, .fatos { overflow-wrap: anywhere; }
+.avisos { font-size: .9rem; color: var(--tinta-2); display: flex; flex-direction: column; gap: .3rem; padding-left: 1.1rem; margin: 0; }
+.rodape { font-size: .85rem; color: var(--tinta-2); border-top: 1px solid var(--linha); padding-top: 1rem; display: flex; flex-direction: column; gap: .4rem; }
+.vazio { color: var(--tinta-2); font-style: italic; }
+
+@media (max-width: 520px) {
+  .fatos li { grid-template-columns: 1fr; gap: .2rem; }
+  body { font-size: 1rem; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sumario a { transition: border-color .15s, color .15s; }
+}
+</style>
+
+<div class="coluna" id="app">
+  <header class="cabecalho">
+    <span class="rotulo">Boletim Cívico · política e economia federal</span>
+    <h1 id="titulo">Boletim da semana</h1>
+    <div class="linha-edicao" id="edicao"></div>
+    <nav class="sumario" id="sumario" aria-label="Seções"></nav>
+  </header>
+  <main class="coluna" id="conteudo"></main>
+  <footer class="rodape" id="rodape"></footer>
+</div>
+
+<script id="dados" type="application/json">{{DADOS}}</script>
+<script>
+(function () {
+  "use strict";
+  var D = JSON.parse(document.getElementById("dados").textContent);
+  var C = D.conteudo || {}, K = D.coletados || {};
+  var E = (K.economia || {}), S = E.series || {};
+
+  /* ---------- utilitários ---------- */
+  function el(tag, attrs, filhos) {
+    var n = document.createElement(tag);
+    if (attrs) for (var k in attrs) {
+      if (k === "class") n.className = attrs[k];
+      else if (k === "html") n.innerHTML = attrs[k];
+      else if (k === "text") n.textContent = attrs[k];
+      else if (k === "style") n.setAttribute("style", attrs[k]);
+      else n.setAttribute(k, attrs[k]);
+    }
+    (filhos || []).forEach(function (f) { if (f != null) n.appendChild(typeof f === "string" ? document.createTextNode(f) : f); });
+    return n;
+  }
+  function svgEl(tag, attrs) {
+    var n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+  var nf = function (v, casas) { return v == null || isNaN(v) ? "—" : Number(v).toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas }); };
+  var brl = function (v) { return v == null ? "—" : Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }); };
+  function dataBR(iso, opts) {
+    if (!iso) return "";
+    var d = new Date(iso.length <= 10 ? iso + "T12:00:00" : iso);
+    return d.toLocaleDateString("pt-BR", opts || { day: "2-digit", month: "2-digit", year: "numeric" });
+  }
+  function mesBR(iso) { return dataBR(iso, { month: "short", year: "2-digit" }).replace(". de ", "/").replace(" de ", "/"); }
+  function cor(nome) { return getComputedStyle(document.documentElement).getPropertyValue(nome).trim(); }
+  function fontes(lista) {
+    if (!lista || !lista.length) return null;
+    return el("div", { class: "fontes" }, ["Fontes: "].concat(lista.map(function (f) {
+      return f.url ? el("a", { href: f.url, target: "_blank", rel: "noopener" }, [f.nome || f.url]) : el("span", { text: f.nome + " " });
+    })));
+  }
+  function paragrafos(texto) {
+    if (!texto) return [];
+    return String(texto).split(/\n\s*\n/).map(function (t) { return el("p", { text: t.trim() }); });
+  }
+  var SELOS = { entrega: ["bom", "Entrega"], atencao: ["atencao", "Ponto de atenção"], registro: ["neutro", "Registro"], aprovada: ["bom", "Aprovada"], sancionada: ["bom", "Sancionada"], promulgada: ["bom", "Promulgada"], rejeitada: ["atencao", "Rejeitada"], vetada: ["atencao", "Vetada"], "veto parcial": ["ocre", "Veto parcial"], "em tramitação": ["neutro", "Em tramitação"], editada: ["ocre", "Editada"], "perde validade": ["atencao", "Perde validade"] };
+  function selo(tipo, textoLivre) {
+    var s = SELOS[(tipo || "").toLowerCase()] || ["neutro", textoLivre || tipo || ""];
+    return el("span", { class: "selo " + s[0], text: textoLivre || s[1] });
+  }
+
+  var secoes = [];
+  function secao(id, titulo, intro) {
+    var n = secoes.length + 1;
+    var s = el("section", { id: id }, [
+      el("div", { class: "secao-topo" }, [el("span", { class: "par", text: "§ " + n }), el("h2", { text: titulo })])
+    ]);
+    if (intro) s.appendChild(el("p", { class: "intro", text: intro }));
+    secoes.push([id, titulo]);
+    document.getElementById("conteudo").appendChild(s);
+    return s;
+  }
+
+  /* ---------- gráficos SVG ---------- */
+  function ultimo(serie) { return serie && serie.pontos && serie.pontos.length ? serie.pontos[serie.pontos.length - 1] : null; }
+  function valorEm(serie, diasAtras) {
+    if (!serie || !serie.pontos.length) return null;
+    var fim = new Date(ultimo(serie)[0]); fim.setDate(fim.getDate() - diasAtras);
+    var alvo = fim.toISOString().slice(0, 10), achado = null;
+    serie.pontos.forEach(function (p) { if (p[0] <= alvo) achado = p; });
+    return achado;
+  }
+  function sparkline(pontos, corVar) {
+    var w = 200, h = 34, s = svgEl("svg", { viewBox: "0 0 " + w + " " + h, preserveAspectRatio: "none", "aria-hidden": "true" });
+    if (!pontos || pontos.length < 2) return s;
+    var ys = pontos.map(function (p) { return p[1]; }), min = Math.min.apply(null, ys), max = Math.max.apply(null, ys), r = (max - min) || 1;
+    var pts = pontos.map(function (p, i) { return [i / (pontos.length - 1) * (w - 4) + 2, h - 3 - (p[1] - min) / r * (h - 6)]; });
+    var d = pts.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" ");
+    s.appendChild(svgEl("path", { d: d + " L" + pts[pts.length - 1][0] + " " + h + " L" + pts[0][0] + " " + h + " Z", fill: cor(corVar), "fill-opacity": ".12", stroke: "none" }));
+    s.appendChild(svgEl("path", { d: d, fill: "none", stroke: cor(corVar), "stroke-width": "1.6", "vector-effect": "non-scaling-stroke" }));
+    var u = pts[pts.length - 1];
+    s.appendChild(svgEl("circle", { cx: u[0], cy: u[1], r: 2.5, fill: cor(corVar) }));
+    return s;
+  }
+  // Gráfico de linhas com eixo de tempo; series = [{nome, pontos, corVar}]
+  function grafico(titulo, series, opts) {
+    opts = opts || {};
+    var caixa = el("figure", { class: "grafico", style: "margin:0" });
+    caixa.appendChild(el("h3", { text: titulo }));
+    series = series.filter(function (s) { return s.pontos && s.pontos.length > 1; });
+    if (!series.length) { caixa.appendChild(el("p", { class: "vazio", text: "Dados indisponíveis nesta edição." })); return caixa; }
+    var W = 640, H = 240, m = { t: 12, r: 16, b: 28, l: 44 };
+    var todos = [].concat.apply([], series.map(function (s) { return s.pontos; }));
+    var t0 = Math.min.apply(null, todos.map(function (p) { return +new Date(p[0]); })), t1 = Math.max.apply(null, todos.map(function (p) { return +new Date(p[0]); }));
+    var ys = todos.map(function (p) { return p[1]; }), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+    if (opts.zero) y0 = Math.min(0, y0);
+    var pad = (y1 - y0) * .08 || 1; y0 -= pad; y1 += pad;
+    var passo = Math.pow(10, Math.floor(Math.log10((y1 - y0) / 4))); [1, 2, 2.5, 5, 10].some(function (k) { if ((y1 - y0) / (passo * k) <= 5) { passo *= k; return true; } });
+    var X = function (t) { return m.l + (t - t0) / ((t1 - t0) || 1) * (W - m.l - m.r); };
+    var Y = function (v) { return H - m.b - (v - y0) / (y1 - y0) * (H - m.t - m.b); };
+    var s = svgEl("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": titulo });
+    var cLinha = cor("--linha"), cTexto = cor("--tinta-2");
+    for (var v = Math.ceil(y0 / passo) * passo; v <= y1; v += passo) {
+      s.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), stroke: cLinha, "stroke-width": 1 }));
+      var tx = svgEl("text", { x: m.l - 6, y: Y(v) + 4, "text-anchor": "end", "font-size": 11, fill: cTexto, "font-family": "IBM Plex Mono, monospace" });
+      tx.textContent = nf(v, passo < 1 ? (passo < .1 ? 2 : 1) : 0); s.appendChild(tx);
+    }
+    var meses = (t1 - t0) / 2.6e9, nTicks = meses > 10 ? 6 : 4;
+    for (var i = 0; i <= nTicks; i++) {
+      var t = t0 + (t1 - t0) * i / nTicks, lx = svgEl("text", { x: X(t), y: H - 8, "text-anchor": i === 0 ? "start" : i === nTicks ? "end" : "middle", "font-size": 11, fill: cTexto, "font-family": "IBM Plex Mono, monospace" });
+      lx.textContent = meses > 3 ? mesBR(new Date(t).toISOString()) : dataBR(new Date(t).toISOString(), { day: "2-digit", month: "2-digit" }); s.appendChild(lx);
+    }
+    series.forEach(function (se) {
+      var d = se.pontos.map(function (p, i) { return (i ? "L" : "M") + X(+new Date(p[0])).toFixed(1) + " " + Y(p[1]).toFixed(1); }).join(" ");
+      s.appendChild(svgEl("path", { d: d, fill: "none", stroke: cor(se.corVar), "stroke-width": 2.2, "stroke-linejoin": "round" }));
+      var u = se.pontos[se.pontos.length - 1], ux = X(+new Date(u[0])), uy = Y(u[1]);
+      s.appendChild(svgEl("circle", { cx: ux, cy: uy, r: 3.5, fill: cor(se.corVar) }));
+      var rot = svgEl("text", { x: ux - 6, y: uy - 8, "text-anchor": "end", "font-size": 12, "font-weight": 500, fill: cor(se.corVar), "font-family": "IBM Plex Mono, monospace" });
+      rot.textContent = nf(u[1], opts.casas == null ? 2 : opts.casas); s.appendChild(rot);
+    });
+    caixa.appendChild(s);
+    if (series.length > 1) caixa.appendChild(el("div", { class: "legenda" }, series.map(function (se) { return el("span", { style: "--cor: var(" + se.corVar + ")", text: se.nome }); })));
+    if (opts.nota) caixa.appendChild(el("figcaption", { class: "nota", text: opts.nota }));
+    return caixa;
+  }
+
+  /* ---------- cabeçalho ---------- */
+  var sem = K.semana || C.semana || {};
+  document.getElementById("titulo").textContent = "Semana de " + dataBR(sem.inicio, { day: "numeric", month: "long" }) + " a " + dataBR(sem.fim, { day: "numeric", month: "long", year: "numeric" });
+  var ed = document.getElementById("edicao");
+  ed.appendChild(el("span", { class: "dado", text: "Edição " + (D.edicao || "") }));
+  ed.appendChild(el("span", { text: "Publicado em " + dataBR(D.gerado_em, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) }));
+
+  /* §1 Resumo */
+  var s1 = secao("resumo", "O que importa nesta semana");
+  var ol = el("ol", { class: "destaques" });
+  (C.destaques || []).forEach(function (d) {
+    var txt = typeof d === "string" ? { texto: d } : d;
+    ol.appendChild(el("li", null, [el("div", null, [el("p", { text: txt.texto }), txt.link ? el("a", { href: "#" + txt.link, class: "nota", text: "Ver detalhes" }) : null])]));
+  });
+  s1.appendChild((C.destaques || []).length ? ol : el("p", { class: "vazio", text: "Sem destaques nesta edição." }));
+
+  /* §2 Economia */
+  var s2 = secao("economia", "Economia", C.economia && C.economia.intro);
+  var ind = el("div", { class: "indicadores" });
+  var defs = [
+    ["selic_meta", "Meta Selic", 2, "% a.a.", 30, "--acento"],
+    ["ipca_12m", "IPCA em 12 meses", 2, "%", 31, "--ocre"],
+    ["dolar", "Dólar comercial", 4, "R$", 7, "--neutro"],
+    ["desocupacao", "Desemprego", 1, "%", 31, "--atencao"],
+    ["juros_pf", "Juros ao consumidor", 1, "% a.a.", 31, "--atencao"],
+    ["dbgg", "Dívida bruta", 1, "% do PIB", 31, "--neutro"]
+  ];
+  defs.forEach(function (d) {
+    var se = S[d[0]], u = ultimo(se);
+    if (!u) return;
+    var antes = valorEm(se, d[4]), dif = antes ? u[1] - antes[1] : null;
+    var mensal = se.pontos.length < 40;
+    ind.appendChild(el("div", { class: "ind" }, [
+      el("span", { class: "rotulo", text: d[1] }),
+      el("span", { class: "valor" }, [d[3] === "R$" ? "R$ " + nf(u[1], 2) : nf(u[1], d[2] > 2 ? 2 : d[2]), d[3] === "R$" ? null : el("small", { text: " " + d[3] })]),
+      el("span", { class: "var", text: dif == null ? "" : (dif > 0 ? "▲ " : dif < 0 ? "▼ " : "= ") + nf(Math.abs(dif), d[2]) + (d[4] === 7 ? " na semana" : " em 1 mês") }),
+      sparkline(se.pontos.slice(mensal ? -13 : -60), d[5]),
+      el("span", { class: "ref", text: (mensal ? "Ref. " + mesBR(u[0]) : "Em " + dataBR(u[0], { day: "2-digit", month: "2-digit" })) + " · SGS " + se.codigo })
+    ]));
+  });
+  s2.appendChild(ind);
+  s2.appendChild(grafico("Selic e inflação, últimos 24 meses", [
+    { nome: "Meta Selic (% a.a.)", pontos: (S.selic_meta || {}).pontos, corVar: "--acento" },
+    { nome: "IPCA em 12 meses (%)", pontos: (S.ipca_12m || {}).pontos, corVar: "--ocre" }
+  ], { zero: true, nota: "A distância entre as duas linhas é, aproximadamente, o juro real. Fonte: Banco Central, SGS séries 432 e 13522." }));
+  s2.appendChild(grafico("Dólar comercial, últimos 4 meses (R$)", [{ nome: "Dólar", pontos: (S.dolar || {}).pontos, corVar: "--neutro" }], { casas: 4, nota: "Fonte: Banco Central, SGS série 1 (venda)." }));
+  if (E.focus && E.focus.medianas) {
+    var F = E.focus, nomes = { "IPCA": "IPCA (%)", "PIB Total": "PIB (crescimento %)", "Selic": "Selic no fim do ano (% a.a.)", "Câmbio": "Dólar no fim do ano (R$)", "Resultado primário": "Resultado primário (% do PIB)", "Dívida líquida do setor público": "Dívida líquida (% do PIB)" };
+    var tb = el("table", null, [el("thead", null, [el("tr", null, [el("th", { text: "Indicador" })].concat(F.anos.map(function (a) { return el("th", { class: "n", text: a }); })))])]);
+    var corpo = el("tbody");
+    Object.keys(nomes).forEach(function (k) {
+      if (!F.medianas[k]) return;
+      corpo.appendChild(el("tr", null, [el("td", { text: nomes[k] })].concat(F.anos.map(function (a) { return el("td", { class: "n", text: nf(F.medianas[k][a], k === "Câmbio" ? 2 : k === "PIB Total" ? 1 : 2) }); }))));
+    });
+    tb.appendChild(corpo);
+    s2.appendChild(el("div", null, [el("h3", { text: "O que o mercado espera (boletim Focus)", style: "margin-bottom:.5rem" }), el("div", { class: "tabela" }, [tb]), el("p", { class: "nota", style: "margin-top:.4rem", text: "Medianas das projeções do mercado na divulgação de " + dataBR(F.data) + ". Fonte: Banco Central, Focus." })]));
+  }
+  if (C.economia) {
+    (C.economia.analise ? paragrafos(C.economia.analise) : []).forEach(function (p) { s2.appendChild(p); });
+    if (C.economia.fatos && C.economia.fatos.length) s2.appendChild(itens(C.economia.fatos));
+  }
+
+  function itens(lista) {
+    var box = el("div", { class: "itens" });
+    lista.forEach(function (it) {
+      var meta = el("div", { class: "meta" }, [it.status ? selo(it.status) : null, it.data ? el("span", { class: "dado", text: dataBR(it.data, { day: "2-digit", month: "2-digit" }) }) : null, it.casa ? el("span", { text: it.casa }) : null]);
+      box.appendChild(el("article", { class: "item" }, [
+        meta.childNodes.length ? meta : null,
+        el("h3", { text: it.titulo }),
+        it.texto ? el("div", { style: "display:flex;flex-direction:column;gap:.5rem" }, paragrafos(it.texto)) : null,
+        it.o_que_muda ? el("p", null, [el("strong", { text: "O que muda: " }), it.o_que_muda]) : null,
+        it.lados ? ladosEl(it.lados) : null,
+        fontes(it.fontes)
+      ]));
+    });
+    return box;
+  }
+  function ladosEl(l) {
+    return el("div", { class: "lados" }, [
+      el("div", null, [el("div", { class: "rotulo", text: l.rotulo_a || "Quem defende" }), el("p", { text: l.a || l.a_favor || "" })]),
+      el("div", null, [el("div", { class: "rotulo", text: l.rotulo_b || "Quem critica" }), el("p", { text: l.b || l.contra || "" })])
+    ]);
+  }
+
+  /* §3 Congresso */
+  var s3 = secao("congresso", "Congresso e leis", C.congresso && C.congresso.intro);
+  if (C.leis && C.leis.length) { s3.appendChild(el("h3", { text: "Leis, vetos e medidas provisórias" })); s3.appendChild(itens(C.leis)); }
+  if (C.congresso && C.congresso.itens && C.congresso.itens.length) { s3.appendChild(el("h3", { text: "Outros fatos do Congresso" })); s3.appendChild(itens(C.congresso.itens)); }
+  var vots = ((K.camara || {}).votacoes || []).filter(function (v) { return v.proposicao; });
+  var vistos = {}, linhas = [];
+  vots.forEach(function (v) { var k = v.proposicao.sigla; if (v.placar || !vistos[k]) { vistos[k] = 1; linhas.push(v); } });
+  if (linhas.length) {
+    var tv = el("table", null, [el("thead", null, [el("tr", null, [el("th", { text: "Data" }), el("th", { text: "Proposta" }), el("th", { text: "Resultado" }), el("th", { class: "n", text: "Sim × Não" })])])]);
+    var tbv = el("tbody");
+    linhas.slice(0, 25).forEach(function (v) {
+      tbv.appendChild(el("tr", null, [
+        el("td", { class: "dado", text: dataBR(v.data, { day: "2-digit", month: "2-digit" }) }),
+        el("td", null, [el("a", { href: v.proposicao.url, target: "_blank", rel: "noopener", text: v.proposicao.sigla }), el("div", { class: "nota", text: (v.proposicao.ementa || "").slice(0, 160) + ((v.proposicao.ementa || "").length > 160 ? "…" : "") })]),
+        el("td", null, [selo(v.aprovacao === 1 ? "aprovada" : v.aprovacao === 0 ? "rejeitada" : "registro", v.aprovacao == null ? "Registro" : null)]),
+        el("td", { class: "n", text: v.placar ? v.placar.sim + " × " + v.placar.nao : "simbólica" })
+      ]));
+    });
+    tv.appendChild(tbv);
+    s3.appendChild(el("h3", { text: "Votações no plenário da Câmara" }));
+    s3.appendChild(el("div", { class: "tabela" }, [tv]));
+    s3.appendChild(el("p", { class: "nota", text: "Votação simbólica é aprovada sem registro de voto individual. Fonte: Câmara dos Deputados, dados abertos." }));
+  }
+
+  /* §4 Deputados acompanhados */
+  var s4 = secao("deputados", "Deputados que você acompanha", "Fatos verificáveis da semana. Entrega e ponto de atenção seguem critérios fixos, explicados no rodapé; a avaliação política fica para os dois lados.");
+  var ceap = K.ceap;
+  (C.deputados || []).forEach(function (dp) {
+    var card = el("article", { class: "deputado" }, [
+      el("div", { class: "topo" }, [el("h3", { text: dp.nome + (dp.partido ? " (" + dp.partido + (dp.uf ? "-" + dp.uf : "") + ")" : "") }), dp.status ? selo("registro", dp.status) : null]),
+      dp.cargo ? el("p", { class: "cargo", text: dp.cargo }) : null
+    ]);
+    var fl = el("ul", { class: "fatos" });
+    (dp.fatos || []).forEach(function (f) {
+      fl.appendChild(el("li", null, [selo(f.tipo), el("div", null, [el("p", { text: f.texto }), fontes(f.fontes)])]));
+    });
+    card.appendChild((dp.fatos || []).length ? fl : el("p", { class: "vazio", text: dp.sem_novidades || "Nenhum fato público relevante encontrado nesta semana." }));
+    var g = ceap && dp.chave_ceap && ceap.acompanhados && ceap.acompanhados[dp.chave_ceap];
+    if (g && g.total_mes) {
+      var max = g.por_tipo.length ? g.por_tipo[0][1] : 1;
+      card.appendChild(el("div", { class: "barras" }, [el("div", { class: "rotulo", text: "Cota parlamentar em " + ceap.mes + ": " + brl(g.total_mes) + " · média da Câmara " + brl(ceap.media) + (g.posicao ? " · " + g.posicao + "º de " + ceap.deputados_com_gasto : "") })].concat(g.por_tipo.slice(0, 5).map(function (t) {
+        return el("div", { class: "barra" }, [el("span", { text: t[0].toLowerCase() }), el("span", { class: "num", style: "text-align:right", text: brl(t[1]) }), el("div", { class: "trilho" }, [el("i", { style: "width:" + (t[1] / max * 100).toFixed(1) + "%" })])]);
+      }))));
+    }
+    if (dp.lados) card.appendChild(ladosEl(dp.lados));
+    s4.appendChild(card);
+  });
+
+  /* §5 Em evidência */
+  var s5 = secao("evidencia", "Deputados em evidência", C.em_evidencia && C.em_evidencia.criterio);
+  if (C.em_evidencia && C.em_evidencia.deputados) s5.appendChild(itens(C.em_evidencia.deputados));
+  if (ceap && ceap.ranking && ceap.ranking.length) {
+    var tr = el("table", null, [el("thead", null, [el("tr", null, [el("th", { class: "n", text: "#" }), el("th", { text: "Deputado" }), el("th", { class: "n", text: "Gasto" }), el("th", { class: "n", text: "× média" })])])]);
+    var tbr = el("tbody");
+    ceap.ranking.forEach(function (r, i) {
+      tbr.appendChild(el("tr", null, [el("td", { class: "n", text: i + 1 }), el("td", { text: r.nome + " (" + r.partido + "-" + r.uf + ")" }), el("td", { class: "n", text: brl(r.total) }), el("td", { class: "n", text: nf(r.total / ceap.media, 1) + "×" })]));
+    });
+    tr.appendChild(tbr);
+    s5.appendChild(el("h3", { text: "Maiores gastos da cota parlamentar em " + ceap.mes }));
+    s5.appendChild(el("div", { class: "tabela" }, [tr]));
+    s5.appendChild(el("p", { class: "nota" }, ["Média entre os " + ceap.deputados_com_gasto + " deputados com gastos no mês: " + brl(ceap.media) + ". Gasto alto não é irregularidade: a cota varia por estado, e notas atrasadas mudam o total. Fonte: ", el("a", { href: ceap.fonte, target: "_blank", rel: "noopener", text: "Câmara, arquivo da cota parlamentar" }), "."]));
+  }
+
+  /* §6 Governo e Justiça */
+  if ((C.executivo || []).length || (C.justica || []).length) {
+    var s6 = secao("governo-justica", "Governo federal e Justiça");
+    if ((C.executivo || []).length) { s6.appendChild(el("h3", { text: "Governo federal" })); s6.appendChild(itens(C.executivo)); }
+    if ((C.justica || []).length) { s6.appendChild(el("h3", { text: "STF e tribunais superiores" })); s6.appendChild(itens(C.justica)); }
+  }
+
+  /* §7 Bahia */
+  if ((C.bahia || []).length) { var s7 = secao("bahia", "Bahia e Salvador, em resumo"); s7.appendChild(itens(C.bahia)); }
+
+  /* §8 Agenda */
+  var s8 = secao("agenda", "Agenda da próxima semana");
+  var ag = (C.agenda || []).slice();
+  ((K.camara || {}).agenda || []).forEach(function (e) { ag.push({ data: e.inicio, evento: e.descricao, onde: "Plenário da Câmara" + (e.situacao ? " · " + e.situacao.toLowerCase() : "") }); });
+  ag.sort(function (a, b) { return String(a.data).localeCompare(String(b.data)); });
+  if (ag.length) {
+    var ta = el("table", null, [el("thead", null, [el("tr", null, [el("th", { text: "Quando" }), el("th", { text: "O quê" }), el("th", { text: "Onde" })])])]), tba = el("tbody");
+    ag.forEach(function (a) { tba.appendChild(el("tr", null, [el("td", { class: "dado", text: dataBR(a.data, a.data && a.data.length > 10 ? { weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" } : { weekday: "short", day: "2-digit", month: "2-digit" }) }), el("td", { text: a.evento }), el("td", { text: a.onde || "" })])); });
+    ta.appendChild(tba); s8.appendChild(el("div", { class: "tabela" }, [ta]));
+  } else s8.appendChild(el("p", { class: "vazio", text: "Nenhum evento encontrado para a próxima semana." }));
+
+  /* §9 Tema da semana */
+  if (C.tema_da_semana) {
+    var s9 = secao("tema", "Para entender: " + C.tema_da_semana.titulo);
+    s9.appendChild(el("div", { class: "tema" }, paragrafos(C.tema_da_semana.texto).concat([fontes(C.tema_da_semana.fontes)])));
+  }
+
+  /* Rodapé */
+  var rod = document.getElementById("rodape");
+  var av = (C.avisos || []).concat(K.avisos || []);
+  if (av.length) { rod.appendChild(el("strong", { text: "O que não foi possível consultar" })); rod.appendChild(el("ul", { class: "avisos" }, av.map(function (a) { return el("li", { text: a }); }))); }
+  rod.appendChild(el("p", { text: "Critérios: Entrega é um fato concreto do mandato (projeto aprovado, relatoria concluída, presença em votação importante). Ponto de atenção é um fato verificável que merece olhar crítico (falta em votação, gasto acima da média, voto contra a orientação do próprio partido, investigação aberta). Registro é um fato sem juízo." }));
+  rod.appendChild(el("p", { text: "Os dados vêm de fontes oficiais consultadas na data de publicação. O boletim é informativo, não toma partido e não substitui a leitura das fontes." }));
+
+  /* Sumário */
+  var nav = document.getElementById("sumario");
+  secoes.forEach(function (s) { nav.appendChild(el("a", { href: "#" + s[0], text: s[1] })); });
+})();
+</script>
