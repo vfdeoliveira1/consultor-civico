@@ -141,8 +141,29 @@ tr { break-inside: avoid; }
 .partido { font-size: 8pt; color: var(--tinta-2); }
 .sim { color: var(--bom); } .nao { color: var(--atencao); } .outro { color: var(--tinta-2); }
 .contra { font-weight: 700; text-decoration: underline; }
+.resumo { background: var(--suave); border-left: 3px solid var(--acento); padding: 6px 10px; display: flex; flex-direction: column; gap: 3px; }
 .indice a { font-family: var(--f-dado); margin-right: 5px; }
 """
+
+
+def plural(n, um, varios):
+    return f"{n} {um if n == 1 else varios}"
+
+
+def contagem(todas_cam, cam, todas_sen, sen):
+    """Quantas votações a semana teve e quantas estão no PDF, para o leitor saber que nada ficou de fora."""
+    simb = len(todas_cam) - len([v for v in todas_cam if v.get("votos")])
+    secretas = len([v for v in todas_sen if v.get("secreta")])
+    linhas = [
+        f"<p><strong>Câmara:</strong> {plural(len(todas_cam), 'votação', 'votações')} no plenário nesta semana. "
+        f"{plural(len(cam), 'foi nominal', 'foram nominais')}, com o voto de cada deputado, e {'está' if len(cam) == 1 else 'estão'} neste PDF"
+        + (f"; {plural(simb, 'foi simbólica', 'foram simbólicas')}, sem registro de voto individual." if simb else ".") + "</p>",
+        f"<p><strong>Senado:</strong> {plural(len(todas_sen), 'votação nominal', 'votações nominais')} no plenário"
+        + (f", {plural(secretas, 'secreta', 'secretas')}" if secretas else "")
+        + f"; {plural(len(sen), 'está', 'estão')} neste PDF. A fonte do Senado traz só as votações nominais.</p>",
+        f"<p><strong>Total neste PDF:</strong> {plural(len(cam) + len(sen), 'votação', 'votações')} com voto individual.</p>",
+    ]
+    return "".join(linhas)
 
 
 def main():
@@ -152,8 +173,10 @@ def main():
     ap.add_argument("--titulo-extra", default="", help='texto acrescentado ao título, ex.: "(edição de teste)"')
     a = ap.parse_args()
     k = json.load(open(a.coletados, encoding="utf-8"))
-    cam = [v for v in (k.get("camara") or {}).get("votacoes", []) if v.get("votos") and v.get("proposicao")]
-    sen = [v for v in (k.get("senado") or {}).get("votacoes", []) if v.get("votos")]
+    todas_cam = (k.get("camara") or {}).get("votacoes", [])
+    todas_sen = (k.get("senado") or {}).get("votacoes", [])
+    cam = [v for v in todas_cam if v.get("votos") and v.get("proposicao")]
+    sen = [v for v in todas_sen if v.get("votos")]
     if not cam and not sen:
         print("Semana sem votação nominal: o PDF de votos não é gerado.")
         sys.exit(3)
@@ -161,6 +184,7 @@ def main():
     ini, fim = k["semana"]["inicio"], k["semana"]["fim"]
     periodo = f"{data_br(ini)} a {dt.date.fromisoformat(fim).strftime('%d/%m/%Y')}"
     titulo = f"Votos da semana {periodo} {a.titulo_extra}".strip()
+    resumo = contagem(todas_cam, cam, todas_sen, sen)
     partes = []
     for nome_casa, prefixo, lista, cadastro, quem in (
         ("Câmara", "C", cam, (k.get("camara") or {}).get("deputados", {}), "deputados"),
@@ -182,6 +206,7 @@ def main():
         f'<header class="cabecalho"><span class="nota">BOLETIM CÍVICO · ANEXO DE VOTOS</span><h1>{esc(titulo)}</h1>'
         '<p>Para achar um parlamentar, use a busca do seu leitor de PDF (a lupa ou Ctrl+F) e digite o nome. '
         'Cada coluna é uma votação nominal do plenário; a legenda de cada Casa diz qual.</p>'
+        f'<div class="resumo">{resumo}</div>'
         f'<p class="nota">Fontes: Câmara dos Deputados, dados abertos; Senado Federal, dados abertos (via servidor MCP senado-br). Coletado em {esc(k.get("coletado_em", "")[:10])}.</p></header>'
         + "".join(partes)
         + "</body></html>"
