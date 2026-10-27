@@ -1,0 +1,12 @@
+{
+  "_como_editar": "Cada tema tem um nome e uma lista de palavras-chave. A página procura cada palavra no começo de uma palavra do texto, sem diferenciar acentos e maiúsculas: \"tribut\" acha tributo, tributário, tributação. Palavras de até 4 letras (como \"mei\" ou \"sus\") só valem como palavra inteira. Para mudar os temas, edite esta lista.",
+  "temas": [
+    {"nome": "Impostos e contas públicas", "palavras": ["tribut", "impost", "icms", "iss", "ipi", "irpf", "imposto de renda", "arrecad", "fiscal", "orçament", "dívida pública", "arcabouço"]},
+    {"nome": "Trabalho, emprego e previdência", "palavras": ["trabalh", "emprego", "desempreg", "salári", "clt", "jornada", "escala 6x1", "aposentad", "previdên", "inss", "fgts"]},
+    {"nome": "Segurança pública", "palavras": ["segurança pública", "polícia", "policia", "crime", "criminal", "penal", "violên", "armas", "arma de fogo", "presídio", "facção"]},
+    {"nome": "Saúde", "palavras": ["saúde", "sus", "hospital", "médic", "medicament", "vacin", "doença"]},
+    {"nome": "Educação", "palavras": ["educa", "escola", "ensino", "universidad", "professor", "estudant", "creche"]},
+    {"nome": "Pequenos negócios", "palavras": ["mei", "microempreendedor", "microempresa", "pequena empresa", "pequenas empresas", "simples nacional"]},
+    {"nome": "Bahia e Salvador", "palavras": ["bahia", "baian", "salvador"]}
+  ]
+}

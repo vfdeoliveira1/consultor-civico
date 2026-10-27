@@ -19,6 +19,10 @@ Para mudar o boletim, edite este arquivo. A tarefa agendada só manda ler e segu
 
 Quando o leitor mudar esta lista, siga a versão nova.
 
+### Temas acompanhados
+
+Os temas do leitor e as palavras-chave de cada um ficam em `temas.json`. Não mude esse arquivo na sessão semanal; quando o leitor pedir outro tema, ele é editado no repositório.
+
 ### Deputados em evidência
 
 Além dos acompanhados, escolha de **3 a 5 deputados federais em exercício** que foram os mais comentados da semana. Não há API de redes sociais. Use este método e explique-o em `em_evidencia.criterio`:
@@ -74,7 +78,7 @@ Não faça commit nem push dos boletins nem dos PDFs no repositório.
 
 | Seção | O que entra | Fontes |
 |---|---|---|
-| **O que importa** (`destaques`) | 4 a 6 frases, uma por assunto, do mais ao menos importante. Abaixo delas, a tabela "Em relação à semana anterior" entra sozinha, a partir do `coleta.py`: meta Selic, dólar, Focus e números do Congresso nas duas semanas. Não a repita no texto; use os destaques para explicar uma mudança relevante. | Tudo abaixo. |
+| **O que importa** (`destaques`) | No topo, o bloco "Seus temas nesta semana" entra sozinho: o `montar.py` lê `temas.json` e a página procura as palavras-chave de cada tema em tudo o que o boletim traz. Depois, 4 a 6 frases, uma por assunto, do mais ao menos importante. Abaixo delas, a tabela "Em relação à semana anterior" entra sozinha, a partir do `coleta.py`: meta Selic, dólar, Focus e números do Congresso nas duas semanas. Não a repita no texto; use os destaques para explicar uma mudança relevante. | Tudo abaixo. |
 | **Economia** (`economia`) | Os indicadores e gráficos vêm do `coleta.py`. Você escreve a análise: o que mudou na semana, decisões do Copom, divulgações (IPCA, PIB, emprego), dados fiscais e o que esperar. | `coleta.py` (SGS e Focus), MCP `bcb-br`, busca na web para o contexto. IBGE: tente `apisidra.ibge.gov.br`; se falhar, use a série do Banco Central e diga isso. |
 | **Congresso e leis** (`leis`, `congresso`) | PECs e projetos importantes aprovados ou rejeitados em cada Casa, leis promulgadas pelo Congresso e vetos derrubados ou mantidos. Para cada lei, diga o que muda e compare com o texto anterior no acervo (`~/leis`). As votações dos plenários da Câmara e do Senado, com o voto de cada parlamentar, entram sozinhas pelo `coleta.py`: não as repita. Use o `conteudo.json` para explicar as votações mais importantes. | API da Câmara e MCP `senado-br` (já chamados pelo `coleta.py`), `normas.leg.br`, Diário Oficial (`www.in.gov.br`), acervo local. |
 | **Consultar um parlamentar** | Seção automática: busca por nome de qualquer deputado federal ou senador em exercício, com os votos nas votações nominais, os discursos, as proposições apresentadas e a cota parlamentar da semana. Não precisa de conteúdo. | `coleta.py` e `atividade.py`. |
