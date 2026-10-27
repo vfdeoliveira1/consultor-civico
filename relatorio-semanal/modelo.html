@@ -161,6 +161,16 @@ details.votos[open] > * + * { margin-top: .6rem; }
 .lista-votos li { display: flex; justify-content: space-between; gap: .5rem; padding: .2rem 0; border-bottom: 1px dotted var(--linha); min-width: 0; }
 .resultados { display: flex; flex-direction: column; gap: 1.2rem; }
 .parlamentar { display: flex; flex-direction: column; gap: .5rem; }
+.parlamentar { background: var(--folha); border: 1px solid var(--linha); border-radius: var(--raio); padding: 1rem; }
+.parlamentar h4 { font-family: var(--f-titulo); font-size: .95rem; margin: .4rem 0 0; }
+.lista-atividade { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: .5rem; font-size: .93rem; overflow-wrap: anywhere; }
+.botao { font-family: var(--f-titulo); font-weight: 600; font-size: .9rem; padding: .45rem .9rem; border-radius: var(--raio); border: 1px solid var(--acento); background: var(--acento); color: var(--folha); cursor: pointer; }
+.botao.secundario { background: var(--folha); color: var(--acento); }
+.botao:disabled { opacity: .6; cursor: progress; }
+.botao:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+.acoes-ia, .escolhas { display: flex; flex-wrap: wrap; gap: .5rem; }
+.resumo-ia { white-space: pre-wrap; background: var(--acento-suave); border-radius: var(--raio); padding: .8rem 1rem; font-size: .95rem; }
+
 
 
 @media (max-width: 520px) {
@@ -198,6 +208,7 @@ details.votos[open] > * + * { margin-top: .6rem; }
   function el(tag, attrs, filhos) {
     var n = document.createElement(tag);
     if (attrs) for (var k in attrs) {
+      if (attrs[k] == null) continue;
       if (k === "class") n.className = attrs[k];
       else if (k === "html") n.innerHTML = attrs[k];
       else if (k === "text") n.textContent = attrs[k];
@@ -517,57 +528,137 @@ details.votos[open] > * + * { margin-top: .6rem; }
   if (votSen.length) { var bs = el("div", { class: "itens" }); votSen.forEach(function (v) { bs.appendChild(cartaoVotacao(v, "Senado")); }); s3.appendChild(bs); s3.appendChild(el("p", { class: "nota", text: "Fonte: Senado Federal, dados abertos, consultados pelo servidor MCP senado-br." })); }
   else s3.appendChild(el("p", { class: "vazio", text: K.senado ? "Nenhuma votação nominal no plenário do Senado nesta semana." : "As votações do Senado não foram coletadas nesta edição." }));
 
-  /* Como votou: busca por nome em todas as votações nominais da semana */
-  var indice = {};
-  function indexar(lista, casa, cadastro) {
+  /* Consultar um parlamentar: votos, discursos, proposições e cota de qualquer deputado ou senador */
+  var AT = K.atividade || {}, ATC = AT.camara || {}, ATS = AT.senado || {};
+  var pessoas = {};
+  function pessoa(casa, id, cad) {
+    var k = casa + ":" + id;
+    if (!pessoas[k] && cad) pessoas[k] = { k: k, id: id, casa: casa, nome: cad[0], partido: cad[1], uf: cad[2], votos: [], discursos: [], props: [] };
+    return pessoas[k];
+  }
+  Object.keys(ATC.deputados || CAMARA_D).forEach(function (id) { pessoa("Câmara", id, (ATC.deputados || CAMARA_D)[id]); });
+  Object.keys(ATS.senadores || SENADO_S).forEach(function (id) { pessoa("Senado", id, (ATS.senadores || SENADO_S)[id]); });
+  function indexarVotos(lista, casa, cadastro) {
     lista.forEach(function (v) {
-      (v.votos || []).forEach(function (x) {
-        var c = cadastro[x[0]]; if (!c) return;
-        var k = casa + ":" + x[0];
-        indice[k] = indice[k] || { nome: c[0], partido: c[1], uf: c[2], casa: casa, votos: [] };
-        indice[k].votos.push({ v: v, voto: x[1] });
-      });
+      var votou = {};
+      (v.votos || []).forEach(function (x) { votou[x[0]] = 1; var p = pessoa(casa, x[0], cadastro[x[0]]); if (p) p.votos.push({ v: v, voto: x[1] }); });
+      // Quem está em exercício e não aparece na lista de votos desta votação
+      Object.keys(pessoas).forEach(function (k) { var p = pessoas[k]; if (p.casa === casa && !votou[p.id]) p.votos.push({ v: v, voto: null }); });
     });
   }
-  indexar(nominaisCam, "Câmara", CAMARA_D); indexar(votSen, "Senado", SENADO_S);
-  var chaves = Object.keys(indice);
-  var sv = secao("como-votou", "Como votou cada parlamentar", chaves.length ? "Digite o nome de um deputado federal ou senador para ver o voto dele em cada votação nominal da semana." : null);
+  indexarVotos(nominaisCam, "Câmara", CAMARA_D); indexarVotos(votSen, "Senado", SENADO_S);
+  Object.keys(ATC.discursos || {}).forEach(function (id) { var p = pessoas["Câmara:" + id]; if (p) p.discursos = ATC.discursos[id]; });
+  Object.keys(ATS.discursos || {}).forEach(function (id) { var p = pessoas["Senado:" + id]; if (p) p.discursos = ATS.discursos[id]; });
+  Object.keys(ATC.autoria || {}).forEach(function (id) { var p = pessoas["Câmara:" + id]; if (p) p.props = ATC.autoria[id].map(function (i) { return ATC.proposicoes[i]; }); });
+  Object.keys(ATS.autoria || {}).forEach(function (id) { var p = pessoas["Senado:" + id]; if (p) p.props = ATS.autoria[id].map(function (i) { return ATS.materias[i]; }); });
+  var chaves = Object.keys(pessoas).sort(function (a, b) { return pessoas[a].nome.localeCompare(pessoas[b].nome, "pt-BR"); });
+  var totCam = ((K.camara || {}).votacoes || []).length, simbCam = totCam - ((K.camara || {}).votacoes || []).filter(function (v) { return v.votos && v.votos.length; }).length;
+  var sv = secao("parlamentares", "Consultar um parlamentar", chaves.length ? "Digite o nome de qualquer deputado federal ou senador em exercício para ver o que ele fez na semana: votos, discursos, proposições apresentadas e gastos da cota parlamentar." : null);
+  var amostra = null;
+  if (window.claude && window.claude.use) window.claude.use("sample").then(function (f) { amostra = f; document.querySelectorAll(".ia, .ia-nota").forEach(function (b) { b.hidden = !f; }); }).catch(function () {});
+  function cotaDe(p) {
+    if (p.casa === "Câmara") { var c = ceap && ceap.por_deputado && ceap.por_deputado[normaliza(p.nome)]; return c ? { texto: brl(c[0]) + " em " + ceap.mes + " (" + c[1] + "º de " + ceap.deputados_com_gasto + "; média da Câmara " + brl(ceap.media) + ")", valor: c[0], periodo: ceap.mes, posicao: c[1], media: ceap.media } : null; }
+    var v = ATS.ceaps_ano && ATS.ceaps_ano[p.id]; return v != null ? { texto: brl(v) + " no acumulado de " + ATS.ano_ceaps, valor: v, periodo: "ano de " + ATS.ano_ceaps } : null;
+  }
+  function dadosParaIA(p) {
+    var c = cotaDe(p);
+    return {
+      parlamentar: p.nome, partido: p.partido, uf: p.uf, casa: p.casa === "Câmara" ? "Câmara dos Deputados" : "Senado Federal",
+      semana: { inicio: sem.inicio, fim: sem.fim },
+      votacoes_nominais: p.votos.map(function (r) { var v = r.v; return { data: v.data, proposta: p.casa === "Câmara" ? v.proposicao.sigla : v.materia, descricao: v.descricao, voto: r.voto || "não consta voto", orientacao_do_partido: p.casa === "Câmara" ? orientacaoDe(v.orientacoes, p.partido) : null, resultado: p.casa === "Câmara" ? (v.aprovacao === 1 ? "aprovada" : v.aprovacao === 0 ? "rejeitada" : null) : v.resultado }; }),
+      discursos: p.discursos.map(function (d) { return { data: d[0], tipo: d[1], fase: d[2], resumo: d[3] }; }),
+      proposicoes_apresentadas: p.props.map(function (x) { return { tipo: x[0], numero: x[1], ano: x[2], data: x[3], ementa: x[4] }; }),
+      cota_parlamentar: c ? { valor: c.valor, periodo: c.periodo, posicao: c.posicao || null, media_da_casa: c.media || null } : null,
+      votacoes_simbolicas_na_camara_sem_voto_individual: p.casa === "Câmara" ? simbCam : null
+    };
+  }
+  var ERROS_IA = { not_granted: "O resumo com IA não foi permitido nesta página.", sampling_disabled: "O Claude não está disponível nesta conta.", rate_limited: "Muitos pedidos em pouco tempo ou limite de uso atingido. Tente de novo mais tarde.", session_expired: "Sua sessão expirou. Entre de novo no claude.ai.", refused: "O Claude não gerou o resumo para estes dados.", empty_completion: "O Claude não devolveu texto. Tente de novo.", prompt_too_large: "Há dados demais para resumir de uma vez." };
+  function cartao(p) {
+    var cota = cotaDe(p), votou = p.votos.filter(function (r) { return r.voto; }).length;
+    var box = el("article", { class: "parlamentar" }, [
+      el("h3", { text: p.nome + " (" + p.partido + "-" + p.uf + ") · " + (p.casa === "Câmara" ? "deputado federal" : "senador") }),
+      el("p", { class: "nota", text: [p.votos.length ? "votou em " + votou + " de " + p.votos.length + " votações nominais" : "nenhuma votação nominal na " + (p.casa === "Câmara" ? "Câmara" : "Senado"), p.discursos.length + (p.discursos.length === 1 ? " discurso" : " discursos"), p.props.length + (p.props.length === 1 ? " proposição apresentada" : " proposições apresentadas"), cota ? "cota: " + cota.texto : null].filter(Boolean).join(" · ") })
+    ]);
+    // Resumo com IA: só aparece quando a página pode perguntar ao Claude
+    var btn = el("button", { type: "button", class: "botao ia", id: "ia-" + p.k.replace(/[^A-Za-z0-9]/g, "-") }, ["Resumir com IA"]);
+    var parar = el("button", { type: "button", class: "botao secundario", hidden: "hidden" }, ["Parar"]);
+    var saida = el("div", { class: "resumo-ia", "aria-live": "polite", hidden: "hidden" });
+    btn.hidden = !amostra;
+    var ctl = null;
+    parar.addEventListener("click", function () { if (ctl) ctl.abort(); });
+    btn.addEventListener("click", function () {
+      if (!amostra) return;
+      ctl = new AbortController();
+      btn.disabled = true; parar.hidden = false; saida.hidden = false; saida.textContent = "Pensando…";
+      var prompt = "Resuma em português do Brasil o que este parlamentar fez na semana, usando SOMENTE os dados em JSON abaixo, que vêm das fontes oficiais da Câmara e do Senado. Regras: escreva de 3 a 6 tópicos curtos, cada um numa linha começando com \"- \"; não use conhecimento de fora dos dados; não dê opinião nem use adjetivos de julgamento; copie números e datas exatamente como estão; quando um tipo de atividade não aparecer nos dados (por exemplo, nenhum discurso), diga isso; \"não consta voto\" significa que o voto não foi registrado, sem dizer por quê; votos contra a orientação do partido devem ser citados de forma neutra. Não escreva título nem conclusão.\n\nDADOS:\n" + JSON.stringify(dadosParaIA(p));
+      amostra(prompt, { signal: ctl.signal, onText: function (u) { saida.textContent = u.text; } })
+        .then(function (r) { saida.textContent = r.text + (r.truncated ? "\n\n(Resumo interrompido.)" : ""); })
+        .catch(function (e) {
+          saida.textContent = (e && e.text) || "";
+          if (e && e.code === "cancelled") { if (!saida.textContent) saida.hidden = true; return; }
+          if (e && (e.code === "not_granted" || e.code === "sampling_disabled")) document.querySelectorAll(".ia, .ia-nota").forEach(function (b) { b.hidden = true; });
+          saida.appendChild(el("p", { class: "nota", text: ERROS_IA[e && e.code] || "Não foi possível gerar o resumo agora. Tente de novo." }));
+        })
+        .then(function () { btn.disabled = false; parar.hidden = true; });
+    });
+    box.appendChild(el("div", { class: "acoes-ia" }, [btn, parar]));
+    box.appendChild(saida);
+    box.appendChild(el("p", { class: "nota ia-nota", hidden: amostra ? null : "hidden", text: "O resumo é escrito pelo Claude só com os dados desta página e usa o seu limite de uso do Claude." }));
+
+    if (p.votos.length) {
+      var t = el("table", null, [el("thead", null, [el("tr", null, [el("th", { text: "Data" }), el("th", { text: "Proposta" }), el("th", { text: "Voto" })].concat(p.casa === "Câmara" ? [el("th", { text: "Partido orientou" })] : []).concat([el("th", { text: "Resultado" })]))])]);
+      var tb = el("tbody");
+      p.votos.forEach(function (r) {
+        var v = r.v, sig = p.casa === "Câmara" ? v.proposicao.sigla : v.materia;
+        var o = p.casa === "Câmara" ? orientacaoDe(v.orientacoes, p.partido) : null;
+        var contra = o && (o === "Sim" || o === "Não") && (r.voto === "Sim" || r.voto === "Não") && o !== r.voto;
+        tb.appendChild(el("tr", null, [
+          el("td", { class: "dado", text: dataBR(v.data, { day: "2-digit", month: "2-digit" }) }),
+          el("td", null, [el("strong", { text: sig }), el("div", { class: "nota", text: v.descricao || "" })]),
+          el("td", null, [el("span", { class: "selo " + classeVoto(r.voto), text: r.voto || "não consta" }), contra ? el("div", { class: "nota", text: "contra o partido" }) : null])
+        ].concat(p.casa === "Câmara" ? [el("td", { text: o || "—" })] : []).concat([el("td", { text: p.casa === "Câmara" ? (v.aprovacao === 1 ? "Aprovada" : v.aprovacao === 0 ? "Rejeitada" : "—") : (v.resultado || "—") })])));
+      });
+      t.appendChild(tb);
+      box.appendChild(el("h4", { text: "Votos" }));
+      box.appendChild(el("div", { class: "tabela" }, [t]));
+    }
+    box.appendChild(el("h4", { text: "Discursos" }));
+    box.appendChild(p.discursos.length ? el("ul", { class: "lista-atividade" }, p.discursos.map(function (d) {
+      return el("li", null, [el("span", { class: "dado", text: dataBR(d[0], { day: "2-digit", month: "2-digit" }) + " " }), el("strong", { text: [d[1], d[2]].filter(Boolean).join(" · ") }), d[3] ? el("div", { text: d[3] }) : null, d[4] ? el("a", { href: d[4], target: "_blank", rel: "noopener", class: "nota", text: "Texto do discurso" }) : null]);
+    })) : el("p", { class: "vazio", text: "Nenhum discurso registrado na semana." }));
+    box.appendChild(el("h4", { text: "Proposições apresentadas" }));
+    box.appendChild(p.props.length ? el("ul", { class: "lista-atividade" }, p.props.map(function (x) {
+      return el("li", null, [el("a", { href: x[5], target: "_blank", rel: "noopener", text: x[0] + " " + x[1] + "/" + x[2] }), el("span", { class: "nota", text: " · " + dataBR(x[3], { day: "2-digit", month: "2-digit" }) }), el("div", { text: x[4] })]);
+    })) : el("p", { class: "vazio", text: "Nenhuma proposição apresentada na semana, como autor ou coautor." }));
+    if (cota) { box.appendChild(el("h4", { text: "Cota parlamentar" })); box.appendChild(el("p", { text: cota.texto + "." })); }
+    return box;
+  }
   if (chaves.length) {
     var dl = el("datalist", { id: "nomes-parlamentares" });
-    chaves.sort(function (a, b) { return indice[a].nome.localeCompare(indice[b].nome, "pt-BR"); }).forEach(function (k) { var p = indice[k]; dl.appendChild(el("option", { value: p.nome, label: (p.casa === "Câmara" ? "Deputado" : "Senador") + " · " + p.partido + "-" + p.uf })); });
+    chaves.forEach(function (k) { var p = pessoas[k]; dl.appendChild(el("option", { value: p.nome, label: (p.casa === "Câmara" ? "Deputado" : "Senador") + " · " + p.partido + "-" + p.uf })); });
     var caixa = el("input", { type: "search", id: "busca-parlamentar", class: "filtro", list: "nomes-parlamentares", placeholder: "Ex.: nome do deputado ou senador", "aria-label": "Nome do parlamentar" });
     var res = el("div", { class: "resultados", id: "resultado-parlamentar", "aria-live": "polite" });
-    sv.appendChild(el("p", { class: "so-impressao", text: "Na página online do boletim, esta seção tem uma busca por nome com o voto de cada deputado e senador, e cada votação mostra os votos por partido e por parlamentar. No PDF ficam o placar e a orientação de cada votação." }));
+    sv.appendChild(el("p", { class: "so-impressao", text: "Na página online do boletim, esta seção tem uma busca por nome com os votos, discursos, proposições e gastos de cada deputado e senador, e um resumo com IA. O voto de cada um também está no PDF \"Votos da semana\"." }));
     sv.appendChild(el("div", { class: "busca" }, [caixa, dl]));
     sv.appendChild(res);
-    var totCam = ((K.camara || {}).votacoes || []).length, simbCam = totCam - ((K.camara || {}).votacoes || []).filter(function (v) { return v.votos && v.votos.length; }).length;
-    sv.appendChild(el("p", { class: "nota", text: "Nesta semana, a Câmara teve " + totCam + " votações no plenário: " + nominaisCam.length + " nominais, com o voto de cada deputado, e " + simbCam + " simbólicas, sem voto individual. O Senado teve " + votSen.length + " votações nominais. A busca cobre as " + (nominaisCam.length + votSen.length) + " votações nominais, com " + chaves.length + " parlamentares." }));
-    var mostrar = function () {
+    sv.appendChild(el("p", { class: "nota", text: "Nesta semana, a Câmara teve " + totCam + " votações no plenário: " + nominaisCam.length + " nominais, com o voto de cada deputado, e " + simbCam + " simbólicas, sem voto individual. O Senado teve " + votSen.length + " votações nominais. Discursos e proposições vêm dos dados abertos da Câmara e do Senado; no Senado, só os discursos do plenário." }));
+    var buscarParlamentar = function () {
       var q = normaliza(caixa.value.trim());
       res.innerHTML = "";
       if (q.length < 3) return;
-      var achados = chaves.filter(function (k) { return normaliza(indice[k].nome).indexOf(q) >= 0; }).slice(0, 5);
-      if (!achados.length) { res.appendChild(el("p", { class: "vazio", text: "Nenhum parlamentar com esse nome votou nas votações nominais da semana." })); return; }
-      achados.forEach(function (k) {
-        var p = indice[k];
-        var t = el("table", null, [el("thead", null, [el("tr", null, [el("th", { text: "Data" }), el("th", { text: "Proposta" }), el("th", { text: "Voto" })].concat(p.casa === "Câmara" ? [el("th", { text: "Partido orientou" })] : []).concat([el("th", { text: "Resultado" })]))])]);
-        var tb = el("tbody");
-        p.votos.forEach(function (r) {
-          var v = r.v, sig = p.casa === "Câmara" ? v.proposicao.sigla : v.materia;
-          var o = p.casa === "Câmara" ? orientacaoDe(v.orientacoes, p.partido) : null;
-          var contra = o && (o === "Sim" || o === "Não") && (r.voto === "Sim" || r.voto === "Não") && o !== r.voto;
-          tb.appendChild(el("tr", null, [
-            el("td", { class: "dado", text: dataBR(v.data, { day: "2-digit", month: "2-digit" }) }),
-            el("td", null, [el("strong", { text: sig }), el("div", { class: "nota", text: v.descricao || "" })]),
-            el("td", null, [el("span", { class: "selo " + classeVoto(r.voto), text: r.voto || "—" }), contra ? el("div", { class: "nota", text: "contra o partido" }) : null])
-          ].concat(p.casa === "Câmara" ? [el("td", { text: o || "—" })] : []).concat([el("td", { text: p.casa === "Câmara" ? (v.aprovacao === 1 ? "Aprovada" : v.aprovacao === 0 ? "Rejeitada" : "—") : (v.resultado || "—") })])));
-        });
-        t.appendChild(tb);
-        res.appendChild(el("div", { class: "parlamentar" }, [el("h3", { text: p.nome + " (" + p.partido + "-" + p.uf + ") · " + (p.casa === "Câmara" ? "deputado federal" : "senador") }), el("div", { class: "tabela" }, [t])]));
-      });
+      var exato = chaves.filter(function (k) { return normaliza(pessoas[k].nome) === q; });
+      var achados = exato.length ? exato : chaves.filter(function (k) { return normaliza(pessoas[k].nome).indexOf(q) >= 0; });
+      if (!achados.length) { res.appendChild(el("p", { class: "vazio", text: "Nenhum deputado federal ou senador em exercício com esse nome." })); return; }
+      if (achados.length === 1) { res.appendChild(cartao(pessoas[achados[0]])); return; }
+      res.appendChild(el("p", { class: "nota", text: achados.length + " parlamentares encontrados. Escolha um:" }));
+      res.appendChild(el("div", { class: "escolhas" }, achados.slice(0, 12).map(function (k) {
+        var p = pessoas[k], b = el("button", { type: "button", class: "botao secundario" }, [p.nome + " (" + p.partido + "-" + p.uf + ")"]);
+        b.addEventListener("click", function () { caixa.value = p.nome; res.innerHTML = ""; res.appendChild(cartao(p)); });
+        return b;
+      })));
     };
-    caixa.addEventListener("input", mostrar);
-  } else sv.appendChild(el("p", { class: "vazio", text: "Não houve votação nominal na Câmara nem no Senado nesta semana, então não há votos individuais para consultar." }));
+    caixa.addEventListener("input", buscarParlamentar);
+  } else sv.appendChild(el("p", { class: "vazio", text: "Os dados de parlamentares não foram coletados nesta edição." }));
 
   /* §4 Deputados acompanhados */
   var s4 = secao("deputados", "Deputados que você acompanha", "Fatos verificáveis da semana. Entrega e ponto de atenção seguem critérios fixos, explicados no rodapé; a avaliação política fica para os dois lados.");
@@ -730,7 +821,7 @@ details.votos[open] > * + * { margin-top: .6rem; }
     sec.insertBefore(el("a", { class: "voltar", href: "#inicio", text: "← Todos os tópicos" }), sec.firstChild);
     sec.appendChild(el("nav", { class: "topicos-fim", "aria-label": "Outros tópicos" }, [el("span", { class: "rotulo", text: "Outros tópicos" }), botoes(s[0]), el("a", { class: "voltar", href: "#inicio", text: "← Voltar ao início" })]));
   });
-  var ALIAS = { "governo-justica": "presidente" };
+  var ALIAS = { "governo-justica": "presidente", "como-votou": "parlamentares" };
   function abrirTopico() {
     var h = location.hash.replace(/^#/, "");
     h = ALIAS[h] || h;
