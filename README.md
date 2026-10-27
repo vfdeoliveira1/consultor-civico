@@ -15,7 +15,7 @@ O conteúdo das leis não fica neste repositório. Ele vem do acervo público [`
 | `.mcp.json` | Servidores MCP que o Claude Code carrega ao iniciar: `senado-br` (proposições e votações do Senado) e `bcb-br` (Selic, IPCA, câmbio). O `bcb-br` tem `NODE_USE_ENV_PROXY=1` para funcionar atrás do proxy da nuvem. |
 | `setup.sh` | Instala o `ripgrep`, baixa o acervo de leis em `~/leis` e pré-instala o MCP do Banco Central. |
 | `relatorio-semanal/` | Código e instruções do Boletim Cívico (detalhes abaixo). |
-| `site/` | Modelo do site com login (Cloudflare Pages + Cloudflare Access): cabeçalhos de segurança, `robots.txt` e o roteiro de configuração em [`site/CONFIGURAR.md`](site/CONFIGURAR.md). O site publicado fica no branch `site`. |
+| `site/` | Modelo do site com login (Worker da Cloudflare + Cloudflare Access): cabeçalhos de segurança, `robots.txt` e o roteiro de configuração em [`site/CONFIGURAR.md`](site/CONFIGURAR.md). O site publicado fica no branch `site`. |
 
 ## Boletim Cívico semanal
 

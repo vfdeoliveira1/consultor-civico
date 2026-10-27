@@ -1,0 +1,11 @@
+// Configuração do Worker que serve o site (Cloudflare Workers com arquivos estáticos).
+// Sem código próprio: o Worker só entrega os arquivos deste branch, com os cabeçalhos do _headers.
+// O login fica no Cloudflare Access, ligado no painel (ver CONFIGURAR.md no branch main).
+{
+  "name": "boletim-civico",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "." },
+  "workers_dev": true,
+  // Sem endereços de prévia por versão: um endereço a menos para proteger.
+  "preview_urls": false
+}

@@ -1,4 +1,4 @@
-# Cabeçalhos de segurança do Cloudflare Pages, para todos os arquivos do site.
+# Cabeçalhos de segurança do Worker (arquivos estáticos da Cloudflare), para todos os arquivos do site.
 # A política de conteúdo (CSP) detalhada de cada página vai numa <meta> gerada pelo publicar.py,
 # com o hash exato dos scripts daquela página; aqui ficam as regras que valem também para PDFs e JSON.
 /*
