@@ -355,7 +355,8 @@ details.votos[open] > * + * { margin-top: .6rem; }
     }
     function variacao(a, b, casas, sufixo) {
       if (a == null || b == null) return "—";
-      var d = a - b;
+      // Variação dos números como aparecem na tabela, para "5,22% e 5,22%" não virar "▼ 0,01".
+      var f = Math.pow(10, casas), d = Math.round(a * f) / f - Math.round(b * f) / f;
       if (Math.abs(d) < Math.pow(10, -casas) / 2) return "sem mudança";
       return (d > 0 ? "▲\u00a0" : "▼\u00a0") + nf(Math.abs(d), casas) + (sufixo || "");
     }

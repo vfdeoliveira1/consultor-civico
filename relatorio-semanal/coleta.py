@@ -88,19 +88,22 @@ def iso_de_br(s):
     return dt.datetime.strptime(s, "%d/%m/%Y").date().isoformat()
 
 
-def coletar_sgs(hoje):
+def coletar_sgs(corte):
+    """Séries do BCB até o fim da semana do boletim (corte), para não misturar dados de dias seguintes."""
     saida = {}
     for chave, (codigo, nome, unidade, meses) in SERIES.items():
-        ini = hoje - dt.timedelta(days=31 * meses)
+        ini = corte - dt.timedelta(days=31 * meses)
         time.sleep(0.5)  # o firewall do BCB recusa rajadas de pedidos
         try:
             try:
-                dados = get_json(SGS.format(codigo=codigo, ini=br(ini), fim=br(hoje)))
+                dados = get_json(SGS.format(codigo=codigo, ini=br(ini), fim=br(corte)))
             except Exception:
                 # O firewall do BCB às vezes devolve uma página de erro; os últimos 20 pontos vêm de outro endereço.
                 time.sleep(5)
                 dados = get_json(SGS_ULTIMOS.format(codigo=codigo))
             pontos = [[iso_de_br(x["data"]), float(x["valor"])] for x in dados if x.get("valor") not in (None, "")]
+            # A meta Selic vem preenchida até a próxima reunião do Copom; o endereço alternativo ignora o período.
+            pontos = [p for p in pontos if p[0] <= corte.isoformat()]
             if not pontos:
                 raise RuntimeError("série vazia")
             saida[chave] = {"codigo": codigo, "nome": nome, "unidade": unidade, "pontos": pontos}
@@ -109,12 +112,12 @@ def coletar_sgs(hoje):
     return saida
 
 
-def coletar_focus(hoje):
-    """Medianas do Focus na divulgação mais recente e na de uma semana antes, para comparar."""
-    anos = [str(hoje.year), str(hoje.year + 1)]
+def coletar_focus(corte):
+    """Medianas do Focus na última divulgação até o fim da semana (corte) e na de uma semana antes."""
+    anos = [str(corte.year), str(corte.year + 1)]
     indicadores = " or ".join(f"Indicador eq '{i}'" for i in FOCUS_INDICADORES)
     referencias = " or ".join(f"DataReferencia eq '{a}'" for a in anos)
-    filtro = f"Data ge '{(hoje - dt.timedelta(days=21)).isoformat()}' and baseCalculo eq 0 and ({indicadores}) and ({referencias})"
+    filtro = f"Data ge '{(corte - dt.timedelta(days=21)).isoformat()}' and Data le '{corte.isoformat()}' and baseCalculo eq 0 and ({indicadores}) and ({referencias})"
     q = urllib.parse.urlencode({
         "$filter": filtro, "$orderby": "Data desc", "$top": "1000", "$format": "json",
         "$select": "Indicador,IndicadorDetalhe,Data,DataReferencia,Mediana",
@@ -125,7 +128,7 @@ def coletar_focus(hoje):
         avisos.append(f"Boletim Focus: {e}")
         return None
     if not linhas:
-        avisos.append("Boletim Focus: nenhuma divulgação nas últimas três semanas")
+        avisos.append("Boletim Focus: nenhuma divulgação nas três semanas até o fim da semana do boletim")
         return None
 
     def tabela(data):
@@ -394,7 +397,7 @@ def main():
     resultado = {
         "semana": {"inicio": a.inicio.isoformat(), "fim": a.fim.isoformat()},
         "coletado_em": dt.datetime.now().astimezone().isoformat(timespec="minutes"),
-        "economia": {"series": coletar_sgs(hoje), "focus": coletar_focus(hoje)},
+        "economia": {"series": coletar_sgs(a.fim), "focus": coletar_focus(a.fim)},
         "camara": coletar_plenario(a.inicio, a.fim, acompanhados),
         "senado": coletar_senado(a.inicio, a.fim),
         "capitais": coletar_capitais(a.inicio, a.fim, avisos),
