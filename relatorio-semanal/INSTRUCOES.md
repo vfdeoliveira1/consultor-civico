@@ -46,7 +46,7 @@ Passe esses nomes também ao `coleta.py` (`--deputados`), para trazer votos e co
    python3 montar.py --coletados /tmp/boletim/coletados.json --conteudo /tmp/boletim/conteudo.json --saida /tmp/boletim/boletim-AAAA-MM-DD.html
    ```
 6. **Confira a página uma vez** com o Playwright pré-instalado: abra o HTML, veja se não há erro no console e se as seções aparecem. Não altere o `modelo.html` na sessão semanal. Se algo estiver quebrado, conserte o `conteudo.json`.
-7. **Publique.** Carregue o skill `artifact-design` (a ferramenta exige) e publique o HTML com a ferramenta Artifact, como página nova, com `icon: "news"` e uma `description` de uma frase com os 2 ou 3 assuntos principais. Não reescreva o design: o modelo já segue o contrato da página.
+7. **Publique.** Carregue o skill `artifact-design` (a ferramenta exige) e publique o HTML com a ferramenta Artifact, como página nova, com `icon: "news"`, `capabilities: {"sample": {}}` e uma `description` de uma frase com os 2 ou 3 assuntos principais. A capacidade `sample` é a que faz funcionar o botão "Resumir com IA" da consulta de parlamentares; sem ela, o botão fica escondido. Não reescreva o design: o modelo já segue o contrato da página.
 8. **Gere o PDF** do mesmo HTML:
    ```bash
    node pdf.js /tmp/boletim/boletim-AAAA-MM-DD.html /tmp/boletim/boletim-AAAA-MM-DD.pdf
@@ -70,7 +70,7 @@ Não faça commit nem push dos boletins nem dos PDFs no repositório.
 | **O que importa** (`destaques`) | 4 a 6 frases, uma por assunto, do mais ao menos importante. | Tudo abaixo. |
 | **Economia** (`economia`) | Os indicadores e gráficos vêm do `coleta.py`. Você escreve a análise: o que mudou na semana, decisões do Copom, divulgações (IPCA, PIB, emprego), dados fiscais e o que esperar. | `coleta.py` (SGS e Focus), MCP `bcb-br`, busca na web para o contexto. IBGE: tente `apisidra.ibge.gov.br`; se falhar, use a série do Banco Central e diga isso. |
 | **Congresso e leis** (`leis`, `congresso`) | PECs e projetos importantes aprovados ou rejeitados em cada Casa, leis promulgadas pelo Congresso e vetos derrubados ou mantidos. Para cada lei, diga o que muda e compare com o texto anterior no acervo (`~/leis`). As votações dos plenários da Câmara e do Senado, com o voto de cada parlamentar, entram sozinhas pelo `coleta.py`: não as repita. Use o `conteudo.json` para explicar as votações mais importantes. | API da Câmara e MCP `senado-br` (já chamados pelo `coleta.py`), `normas.leg.br`, Diário Oficial (`www.in.gov.br`), acervo local. |
-| **Como votou cada parlamentar** | Seção automática: busca por nome em todas as votações nominais da semana. Não precisa de conteúdo. | `coleta.py`. |
+| **Consultar um parlamentar** | Seção automática: busca por nome de qualquer deputado federal ou senador em exercício, com os votos nas votações nominais, os discursos, as proposições apresentadas e a cota parlamentar da semana, mais o botão "Resumir com IA". Não precisa de conteúdo. | `coleta.py` e `atividade.py`. |
 | **Deputados acompanhados** (`deputados`) | Um card por deputado da tabela de configuração. | Câmara (API e site), TSE (`dadosabertos.tse.jus.br`), Câmara Municipal de Salvador, Assembleia da Bahia, busca na web. |
 | **Em evidência** (`em_evidencia`) | Os 3 a 5 deputados mais comentados, com o critério usado. A tabela de cota parlamentar vem do `coleta.py`. | Busca na web, API da Câmara, `coleta.py`. |
 | **Presidente e governo federal** (`presidente`) | O que o Presidente da República fez na semana, em grupos: `sancoes` (leis sancionadas), `vetos` (vetos novos, totais ou parciais), `mps` (medidas provisórias editadas ou que perderam validade), `decretos` (decretos e outros atos relevantes) e `agenda` (agenda oficial, viagens, anúncios de programas, transição até as posses de 2027). A tabela de vetos à espera do Congresso vem do `coleta.py`. | Diário Oficial, agenda do Presidente em `www.gov.br/planalto`, MCP `senado-br` (vetos), busca na web, Portal da Transparência (com a chave `PORTAL_TRANSPARENCIA_API_KEY`, quando houver). |
@@ -99,7 +99,7 @@ Não faça commit nem push dos boletins nem dos PDFs no repositório.
 
 `conteudo.json` segue `exemplo.json`. Campos:
 
-- `destaques`: lista de `{texto, link}`. `link` é o id da seção (`economia`, `congresso`, `como-votou`, `deputados`, `evidencia`, `presidente`, `justica`, `capitais`, `bahia`, `agenda`, `tema`).
+- `destaques`: lista de `{texto, link}`. `link` é o id da seção (`economia`, `congresso`, `parlamentares`, `deputados`, `evidencia`, `presidente`, `justica`, `capitais`, `bahia`, `agenda`, `tema`).
 - `economia`: `{intro, analise, fatos: [item]}`. `analise` aceita parágrafos separados por linha em branco.
 - `presidente`: `{intro, sancoes, vetos, mps, decretos, agenda}`, cada grupo uma lista de **item**. O campo antigo `executivo` ainda funciona e aparece como "Outros atos do governo".
 - `leis`, `justica`, `bahia`, `congresso.itens`, `em_evidencia.deputados`: listas de **item**.

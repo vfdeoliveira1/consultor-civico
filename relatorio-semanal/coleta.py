@@ -4,7 +4,8 @@
 Busca indicadores no Banco Central (SGS e Focus), as votações dos plenários
 da Câmara e do Senado na semana (com o voto de cada parlamentar), a agenda da
 Câmara, os vetos em tramitação, os gastos da cota parlamentar (CEAP) e os
-projetos de lei das câmaras das capitais (capitais.py). Cada fonte é
+projetos de lei das câmaras das capitais (capitais.py) e a atividade da semana
+de cada deputado e senador (atividade.py). Cada fonte é
 independente: se uma falhar, o erro vai para "avisos" e as demais seguem.
 O resultado é um JSON que o montar.py junta ao conteúdo redigido.
 
@@ -24,6 +25,7 @@ import urllib.request
 import zipfile
 from collections import Counter, defaultdict
 
+from atividade import atividade_camara, atividade_senado
 from capitais import coletar_capitais
 
 SGS = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados?formato=json&dataInicial={ini}&dataFinal={fim}"
@@ -324,6 +326,8 @@ def coletar_ceap(acompanhados, fim):
         "media": round(media, 2),
         "ranking": [{"nome": n, "partido": p, "uf": uf, "total": round(t, 2)} for (n, p, uf), t in ranking[:10]],
         "acompanhados": {nome: resumo(nome) for nome in acompanhados},
+        # Para a consulta de qualquer deputado na página: nome normalizado -> [total no mês, posição]
+        "por_deputado": {normalizar(n): [round(t, 2), i + 1] for i, ((n, _, _), t) in enumerate(ranking)},
         "fonte": CEAP_ANO.format(ano=mes_ref.year),
     }
 
@@ -346,6 +350,10 @@ def main():
         "camara": coletar_plenario(a.inicio, a.fim, acompanhados),
         "senado": coletar_senado(a.inicio, a.fim),
         "capitais": coletar_capitais(a.inicio, a.fim, avisos),
+        "atividade": {
+            "camara": atividade_camara(a.inicio, a.fim, avisos, get_json, camara, CAMARA),
+            "senado": atividade_senado(a.inicio, a.fim, avisos, MCPSenado(), normalizar),
+        },
         "ceap": coletar_ceap(acompanhados, a.fim),
         "avisos": avisos,
     }
