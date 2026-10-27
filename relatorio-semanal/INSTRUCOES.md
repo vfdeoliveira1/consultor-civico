@@ -47,7 +47,14 @@ Passe esses nomes também ao `coleta.py` (`--deputados`), para trazer votos e co
    ```
 6. **Confira a página uma vez** com o Playwright pré-instalado: abra o HTML, veja se não há erro no console e se as seções aparecem. Não altere o `modelo.html` na sessão semanal. Se algo estiver quebrado, conserte o `conteudo.json`.
 7. **Publique.** Carregue o skill `artifact-design` (a ferramenta exige) e publique o HTML com a ferramenta Artifact, como página nova, com `icon: "news"` e uma `description` de uma frase com os 2 ou 3 assuntos principais. Não reescreva o design: o modelo já segue o contrato da página.
-8. **Gere o PDF** do mesmo HTML:
+8. **Registre a edição no arquivo.** O arquivo de edições é a página https://claude.ai/artifact/XQdiMS4ZgKSMxFEKSv8Q5U, que lê um banco de dados próprio. Com a ferramenta `ArtifactData`, grave um documento na coleção `edicoes` com `doc_id` igual à data de início da semana (`AAAA-MM-DD`):
+   ```json
+   {"inicio": "AAAA-MM-DD", "fim": "AAAA-MM-DD", "edicao": "semana ISO/ano, como no cabeçalho do boletim", "publicado_em": "AAAA-MM-DD",
+    "titulo": "título da página", "url": "link da página publicada", "teste": false,
+    "votacoes_nominais": 0, "destaques": ["os 3 primeiros destaques, uma frase cada"]}
+   ```
+   `votacoes_nominais` é a soma das votações nominais da Câmara e do Senado no `coletados.json`. Se já existir documento com esse `doc_id` (uma edição refeita), leia-o com `get` e grave com `if_version`. Não republique a página do arquivo.
+9. **Gere o PDF** do mesmo HTML:
    ```bash
    node pdf.js /tmp/boletim/boletim-AAAA-MM-DD.html /tmp/boletim/boletim-AAAA-MM-DD.pdf
    ```
@@ -58,8 +65,8 @@ Passe esses nomes também ao `coleta.py` (`--deputados`), para trazer votos e co
    node pdf.js /tmp/boletim/votos-AAAA-MM-DD.html /tmp/boletim/votos-AAAA-MM-DD.pdf
    ```
    Se o `votos.py` sair com código 3, a semana não teve votação nominal: não há PDF de votos, e isso vai na resposta final.
-9. **Envie os PDFs** ao leitor com a ferramenta `SendUserFile` (`status: "proactive"`, `display: "attach"`), numa única chamada com os dois arquivos e a legenda "Boletim Cívico e votos da semana, DD/MM a DD/MM". Se a ferramenta não estiver disponível, diga isso na resposta final.
-10. **Responda** com o link da página, o aviso de quais PDFs foram enviados e os destaques em 3 linhas. Essa mensagem vira a notificação no celular do leitor.
+10. **Envie os PDFs** ao leitor com a ferramenta `SendUserFile` (`status: "proactive"`, `display: "attach"`), numa única chamada com os dois arquivos e a legenda "Boletim Cívico e votos da semana, DD/MM a DD/MM". Se a ferramenta não estiver disponível, diga isso na resposta final.
+11. **Responda** com o link da página, o aviso de quais PDFs foram enviados e os destaques em 3 linhas. Essa mensagem vira a notificação no celular do leitor.
 
 Não faça commit nem push dos boletins nem dos PDFs no repositório.
 

@@ -48,7 +48,8 @@ Uma tarefa agendada no claude.ai roda **toda segunda-feira às 7h39** (horário 
 3. roda `relatorio-semanal/coleta.py`, que busca os dados estruturados;
 4. escreve o conteúdo da semana num `conteudo.json`, no formato de `relatorio-semanal/exemplo.json`;
 5. monta a página com `montar.py` e a publica como página privada no claude.ai;
-6. gera os PDFs com `pdf.js` e `votos.py` e os envia ao leitor, com notificação no celular.
+6. registra a edição no arquivo de edições anteriores;
+7. gera os PDFs com `pdf.js` e `votos.py` e os envia ao leitor, com notificação no celular.
 
 O passo a passo completo e as regras de redação estão em [`relatorio-semanal/INSTRUCOES.md`](relatorio-semanal/INSTRUCOES.md). **Para mudar o boletim** (deputados acompanhados, seções, fontes, tom), edite esse arquivo: a tarefa agendada só manda segui-lo.
 
@@ -65,6 +66,7 @@ O passo a passo completo e as regras de redação estão em [`relatorio-semanal/
 | `pdf.js` | Gera o PDF do boletim (A4, tema claro, todos os tópicos em sequência). |
 | `votos.py` | Monta o PDF "Votos da semana": todos os deputados e senadores em ordem alfabética, com o voto em cada votação nominal, para consultar com a busca do leitor de PDF. |
 | `exemplo.json` | Formato do conteúdo semanal, com textos de exemplo. |
+| `arquivo.html` | Página fixa com todas as edições, publicada em https://claude.ai/artifact/XQdiMS4ZgKSMxFEKSv8Q5U. Ela lê a lista do próprio banco de dados, e a sessão semanal só acrescenta a edição nova. |
 
 Para gerar um boletim à mão, para uma semana específica:
 

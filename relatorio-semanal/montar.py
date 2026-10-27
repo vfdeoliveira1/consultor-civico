@@ -10,6 +10,8 @@ import json
 import os
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
+# Página fixa com todas as edições (arquivo.html publicado); cada edição nova é registrada no banco dela.
+ARQUIVO_URL = "https://claude.ai/artifact/XQdiMS4ZgKSMxFEKSv8Q5U"
 
 
 def reduzir(pontos, maximo=160):
@@ -41,6 +43,7 @@ def main():
     dados = {
         "edicao": f"{semana}/{ano}",
         "gerado_em": agora.isoformat(timespec="minutes"),
+        "arquivo_url": ARQUIVO_URL,
         "coletados": coletados,
         "conteudo": conteudo,
     }
