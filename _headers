@@ -1,0 +1,14 @@
+# Cabeçalhos de segurança do Cloudflare Pages, para todos os arquivos do site.
+# A política de conteúdo (CSP) detalhada de cada página vai numa <meta> gerada pelo publicar.py,
+# com o hash exato dos scripts daquela página; aqui ficam as regras que valem também para PDFs e JSON.
+/*
+  Content-Security-Policy: frame-ancestors 'none'; base-uri 'none'; object-src 'none'; form-action 'none'
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: private, no-cache

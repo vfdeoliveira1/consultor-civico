@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-1Zce5PZYTwsOPthd2WbjSrxl39g8dG4ScMbmiBeQFmU='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:,">
+<title>Arquivo do Boletim Cívico</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Serif+4:opsz,wght@8..60,400..650&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: mesma identidade do boletim; uma coluna com a lista das edições, a mais recente primeiro. */
+:root {
+  --papel: #f5f6f3; --folha: #ffffff; --tinta: #17211f; --tinta-2: #4b5855; --linha: #d9dedb;
+  --acento: #0e6655; --acento-suave: #e1efeb; --ocre: #9a6412;
+  --f-titulo: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-texto: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-dado: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --raio: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --papel: #0f1514; --folha: #161e1c; --tinta: #e4ebe8; --tinta-2: #9fb0ab; --linha: #2a3532; --acento: #5cc7ad; --acento-suave: #1b2f2a; --ocre: #e0a54a; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --papel: #0f1514; --folha: #161e1c; --tinta: #e4ebe8; --tinta-2: #9fb0ab; --linha: #2a3532; --acento: #5cc7ad; --acento-suave: #1b2f2a; --ocre: #e0a54a; color-scheme: dark; }
+* { box-sizing: border-box; }
+body {
+  background: var(--papel); color: var(--tinta); font-family: var(--f-texto); font-size: 1.05rem; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 48px;
+}
+.coluna { max-width: 46rem; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 1.6rem; }
+.coluna > * { min-width: 0; }
+h1, h2 { font-family: var(--f-titulo); margin: 0; line-height: 1.15; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--acento); text-underline-offset: 2px; }
+a:focus-visible, input:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+.rotulo { font-family: var(--f-titulo); font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-2); }
+.cabecalho { padding-block: 2.5rem 1.2rem; border-bottom: 3px double var(--tinta); display: flex; flex-direction: column; gap: .5rem; }
+.cabecalho h1 { font-size: clamp(2.1rem, 7vw, 3.2rem); font-weight: 800; font-stretch: 80%; letter-spacing: -.01em; }
+.intro { color: var(--tinta-2); max-width: 62ch; }
+.filtro { width: 100%; max-width: 26rem; font: inherit; font-size: .95rem; padding: .5rem .7rem; border: 1px solid var(--linha); border-radius: var(--raio); background: var(--folha); color: var(--tinta); }
+.lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .8rem; }
+.edicao { background: var(--folha); border: 1px solid var(--linha); border-radius: var(--raio); padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: .5rem; overflow-wrap: anywhere; }
+.edicao .topo { display: flex; flex-wrap: wrap; gap: .3rem .9rem; align-items: baseline; justify-content: space-between; }
+.edicao h2 { font-size: 1.25rem; font-weight: 700; font-stretch: 88%; }
+.edicao h2 a { color: var(--tinta); text-decoration: none; }
+.edicao h2 a:hover { color: var(--acento); }
+.meta { font-family: var(--f-dado); font-size: .8rem; color: var(--tinta-2); font-variant-numeric: tabular-nums; }
+.destaques { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: .3rem; font-size: .95rem; }
+.acoes { display: flex; flex-wrap: wrap; gap: .3rem 1.2rem; }
+.abrir { font-family: var(--f-titulo); font-weight: 600; font-size: .9rem; text-decoration: none; }
+.selo { display: inline-block; font-family: var(--f-titulo); font-size: .68rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: .05rem .4rem; border-radius: 3px; border: 1px solid currentColor; color: var(--ocre); }
+.estado { color: var(--tinta-2); font-style: italic; }
+.rodape { font-size: .85rem; color: var(--tinta-2); border-top: 1px solid var(--linha); padding-top: 1rem; }
+</style>
+
+<div class="coluna">
+  <header class="cabecalho">
+    <span class="rotulo">Boletim Cívico · política e economia federal</span>
+    <h1>Edições anteriores</h1>
+    <p class="intro">Todas as edições do boletim semanal, da mais recente para a mais antiga. Cada uma abre a página completa da semana.</p>
+  </header>
+  <input type="search" id="filtro" class="filtro" placeholder="Buscar por assunto ou data, ex.: MEI, outubro" aria-label="Buscar nas edições">
+  <p class="estado" id="estado">Carregando as edições…</p>
+  <ul class="lista" id="lista"></ul>
+  <footer class="rodape">Uma nova edição entra aqui toda segunda-feira, quando o boletim é publicado. As páginas são privadas: só abre quem tem acesso a elas.</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var lista = document.getElementById("lista"), estado = document.getElementById("estado"), filtro = document.getElementById("filtro");
+  var edicoes = [];
+  function el(tag, attrs, filhos) {
+    var n = document.createElement(tag);
+    for (var k in attrs || {}) { if (attrs[k] == null) continue; if (k === "class") n.className = attrs[k]; else if (k === "text") n.textContent = attrs[k]; else n.setAttribute(k, attrs[k]); }
+    (filhos || []).forEach(function (f) { if (f != null) n.appendChild(typeof f === "string" ? document.createTextNode(f) : f); });
+    return n;
+  }
+  function dataBR(iso, opts) { return iso ? new Date(iso.length <= 10 ? iso + "T12:00:00" : iso).toLocaleDateString("pt-BR", opts) : ""; }
+  function normaliza(t) { return String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+  function texto(e) { return normaliza([e.titulo, (e.destaques || []).join(" "), dataBR(e.inicio, { day: "numeric", month: "long", year: "numeric" }), dataBR(e.fim, { day: "numeric", month: "long", year: "numeric" }), e.edicao].join(" ")); }
+  // No claude.ai cada edição é outra página e abre em nova aba; no site o endereço é relativo e abre na mesma aba.
+  function alvo(url) { return /^https?:/.test(url) ? "_blank" : null; }
+  function render() {
+    var q = normaliza(filtro.value.trim());
+    var vis = edicoes.filter(function (e) { return !q || texto(e).indexOf(q) >= 0; });
+    lista.innerHTML = "";
+    vis.forEach(function (e) {
+      var semana = "Semana de " + dataBR(e.inicio, { day: "numeric", month: "long" }) + " a " + dataBR(e.fim, { day: "numeric", month: "long", year: "numeric" });
+      lista.appendChild(el("li", { class: "edicao" }, [
+        el("div", { class: "topo" }, [
+          el("h2", null, [el("a", { href: e.url, target: alvo(e.url), rel: "noopener", text: semana })]),
+          e.teste ? el("span", { class: "selo", text: "Edição de teste" }) : null
+        ]),
+        el("p", { class: "meta", text: ["Edição " + (e.edicao || "—"), e.publicado_em ? "publicada em " + dataBR(e.publicado_em, { day: "2-digit", month: "2-digit", year: "numeric" }) : null, e.votacoes_nominais != null ? e.votacoes_nominais + " votações nominais" : null].filter(Boolean).join(" · ") }),
+        (e.destaques || []).length ? el("ul", { class: "destaques" }, e.destaques.slice(0, 3).map(function (d) { return el("li", { text: d }); })) : null,
+        el("div", { class: "acoes" }, [
+          el("a", { class: "abrir", href: e.url, target: alvo(e.url), rel: "noopener", text: "Abrir o boletim →" }),
+          e.pdf ? el("a", { class: "abrir", href: e.pdf, text: "PDF" }) : null,
+          e.votos_pdf ? el("a", { class: "abrir", href: e.votos_pdf, text: "PDF dos votos" }) : null
+        ])
+      ]));
+    });
+    estado.hidden = vis.length > 0;
+    if (!vis.length) estado.textContent = edicoes.length ? "Nenhuma edição encontrada com esse termo." : "Ainda não há edições no arquivo. A primeira entra na próxima segunda-feira, quando o boletim for publicado.";
+  }
+  filtro.addEventListener("input", render);
+  function carregar(lista) {
+    edicoes = lista.filter(function (e) { return e && e.url && e.inicio; }).sort(function (a, b) { return a.inicio < b.inicio ? 1 : -1; });
+    render();
+  }
+  var claude = window.claude;
+  // Fora do claude.ai (o site com login), a lista vem do edicoes.json que o publicar.py mantém.
+  if (!claude || !claude.use) {
+    fetch("/edicoes.json", { cache: "no-cache" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(carregar, function () { estado.textContent = "Não foi possível carregar a lista de edições agora. Recarregue a página."; });
+    return;
+  }
+  claude.use("db").then(function (db) {
+    if (!db) { estado.textContent = "Não foi possível carregar o arquivo nesta visualização. Abra a página no claude.ai, com sua conta."; return; }
+    db.collection("edicoes").orderBy("inicio", "desc").onSnapshot(function (snap) {
+      carregar(snap.docs.map(function (d) { return d.data(); }));
+    }, function () { estado.hidden = false; estado.textContent = "Não foi possível carregar o arquivo agora. Recarregue a página."; });
+  });
+})();
+</script>
+
+</html>
