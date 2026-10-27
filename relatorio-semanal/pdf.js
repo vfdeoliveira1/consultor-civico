@@ -31,6 +31,9 @@ const IMPRESSAO = `
   /* Busca e votos individuais só existem na página online; no PDF ficam o placar e a orientação. */
   #como-votou .intro, #como-votou .busca, #como-votou .resultados, details.votos { display: none !important; }
   .so-impressao { display: block !important; }
+  /* No PDF cada capital fica numa linha de resumo; a lista de projetos e a busca ficam na página. */
+  #capitais .busca, #capitais .resultados { display: none !important; }
+  details.capital { padding: .3rem .6rem !important; break-inside: avoid; }
   .votacao { break-inside: avoid; }
 `;
 
