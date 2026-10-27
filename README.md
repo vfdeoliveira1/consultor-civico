@@ -24,7 +24,7 @@ A página abre com os botões dos tópicos. Cada botão mostra um tópico, e no 
 
 | Tópico | Conteúdo |
 |---|---|
-| O que importa nesta semana | 4 a 6 destaques. |
+| O que importa nesta semana | 4 a 6 destaques e a tabela "Em relação à semana anterior": meta Selic, dólar, projeções do Focus, votações no plenário e proposições apresentadas, nas duas semanas. |
 | Economia | Selic, IPCA, dólar, desemprego, juros ao consumidor e dívida pública, com gráficos, mais as projeções do boletim Focus e uma análise. |
 | Congresso e leis | Leis e PECs da semana, comparadas com o texto anterior no acervo, e cada votação nominal da Câmara e do Senado com placar, orientação dos partidos e votos por partido e por parlamentar. |
 | Consultar um parlamentar | Busca por nome de qualquer deputado federal ou senador em exercício: votos nas votações nominais (com aviso de voto contra o partido), discursos, proposições apresentadas e cota parlamentar da semana. |

@@ -110,26 +110,39 @@ def coletar_sgs(hoje):
 
 
 def coletar_focus(hoje):
-    filtro = f"Data ge '{(hoje - dt.timedelta(days=14)).isoformat()}' and baseCalculo eq 0"
+    """Medianas do Focus na divulgação mais recente e na de uma semana antes, para comparar."""
+    anos = [str(hoje.year), str(hoje.year + 1)]
+    indicadores = " or ".join(f"Indicador eq '{i}'" for i in FOCUS_INDICADORES)
+    referencias = " or ".join(f"DataReferencia eq '{a}'" for a in anos)
+    filtro = f"Data ge '{(hoje - dt.timedelta(days=21)).isoformat()}' and baseCalculo eq 0 and ({indicadores}) and ({referencias})"
     q = urllib.parse.urlencode({
-        "$filter": filtro, "$orderby": "Data desc", "$top": "500", "$format": "json",
+        "$filter": filtro, "$orderby": "Data desc", "$top": "1000", "$format": "json",
         "$select": "Indicador,IndicadorDetalhe,Data,DataReferencia,Mediana",
     }, quote_via=urllib.parse.quote)  # OData não aceita "+" no lugar de espaço
     try:
-        linhas = get_json(f"{FOCUS}?{q}")["value"]
+        linhas = [x for x in get_json(f"{FOCUS}?{q}")["value"] if not x.get("IndicadorDetalhe")]
     except Exception as e:
         avisos.append(f"Boletim Focus: {e}")
         return None
     if not linhas:
-        avisos.append("Boletim Focus: nenhuma divulgação nas últimas duas semanas")
+        avisos.append("Boletim Focus: nenhuma divulgação nas últimas três semanas")
         return None
-    data = max(x["Data"] for x in linhas)
-    anos = [str(hoje.year), str(hoje.year + 1)]
-    tabela = {}
-    for x in linhas:
-        if x["Data"] == data and x["Indicador"] in FOCUS_INDICADORES and not x.get("IndicadorDetalhe") and x["DataReferencia"] in anos:
-            tabela.setdefault(x["Indicador"], {})[x["DataReferencia"]] = x["Mediana"]
-    return {"data": data, "anos": anos, "medianas": tabela}
+
+    def tabela(data):
+        t = {}
+        for x in linhas:
+            if x["Data"] == data:
+                t.setdefault(x["Indicador"], {})[x["DataReferencia"]] = x["Mediana"]
+        return t
+
+    datas = sorted({x["Data"] for x in linhas})
+    data = datas[-1]
+    limite = (dt.date.fromisoformat(data) - dt.timedelta(days=7)).isoformat()
+    anteriores = [d for d in datas if d <= limite]
+    saida = {"data": data, "anos": anos, "medianas": tabela(data)}
+    if anteriores:
+        saida["anterior"] = {"data": anteriores[-1], "medianas": tabela(anteriores[-1])}
+    return saida
 
 
 def camara(caminho, **params):
@@ -276,6 +289,41 @@ def coletar_senado(inicio, fim):
     return saida
 
 
+def total_camara(caminho, **params):
+    """Quantidade de itens de um recurso da Câmara, lida do cabeçalho X-Total-Count."""
+    params["itens"] = 1
+    with abrir(f"{CAMARA}/{caminho}?{urllib.parse.urlencode(params)}") as r:
+        return int(r.headers.get("X-Total-Count") or 0)
+
+
+def contar_semana(inicio, fim, camara_votacoes=None, senado_votacoes=None):
+    """Números da atividade do Congresso numa semana. Reaproveita as votações já coletadas, quando há."""
+    n = {}
+    if camara_votacoes is None:
+        camara_votacoes = []
+        for v in camara("votacoes", dataInicio=inicio.isoformat(), dataFim=fim.isoformat(), idOrgao=PLENARIO):
+            votos = get_json(f"{CAMARA}/votacoes/{v['id']}/votos").get("dados", [])
+            camara_votacoes.append({"votos": votos})
+    n["camara_votacoes"] = len(camara_votacoes)
+    n["camara_nominais"] = len([v for v in camara_votacoes if v.get("votos")])
+    n["camara_proposicoes"] = total_camara("proposicoes", dataApresentacaoInicio=inicio.isoformat(), dataApresentacaoFim=fim.isoformat())
+    if senado_votacoes is None:
+        senado_votacoes = MCPSenado().chamar("senado_search_votacoes", dataInicio=inicio.strftime("%Y%m%d"), dataFim=fim.strftime("%Y%m%d")).get("votacoes", [])
+    n["senado_nominais"] = len(senado_votacoes)
+    return n
+
+
+def coletar_comparacao(inicio, fim, camara_atual, senado_atual):
+    ini_ant, fim_ant = inicio - dt.timedelta(days=7), fim - dt.timedelta(days=7)
+    saida = {"semana_anterior": {"inicio": ini_ant.isoformat(), "fim": fim_ant.isoformat()}, "atual": None, "anterior": None}
+    try:
+        saida["atual"] = contar_semana(inicio, fim, camara_atual, senado_atual)
+        saida["anterior"] = contar_semana(ini_ant, fim_ant)
+    except Exception as e:
+        avisos.append(f"Comparação com a semana anterior: {e}")
+    return saida
+
+
 def coletar_ceap(acompanhados, fim):
     """Gastos da cota parlamentar no último mês completo, com ranking e média.
 
@@ -357,6 +405,7 @@ def main():
         "ceap": coletar_ceap(acompanhados, a.fim),
         "avisos": avisos,
     }
+    resultado["comparacao"] = coletar_comparacao(a.inicio, a.fim, resultado["camara"]["votacoes"], resultado["senado"]["votacoes"])
     with open(a.saida, "w", encoding="utf-8") as f:
         json.dump(resultado, f, ensure_ascii=False, indent=1)
     s = resultado["economia"]["series"]
