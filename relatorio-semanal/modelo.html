@@ -168,8 +168,7 @@ details.votos[open] > * + * { margin-top: .6rem; }
 .botao.secundario { background: var(--folha); color: var(--acento); }
 .botao:disabled { opacity: .6; cursor: progress; }
 .botao:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
-.acoes-ia, .escolhas { display: flex; flex-wrap: wrap; gap: .5rem; }
-.resumo-ia { white-space: pre-wrap; background: var(--acento-suave); border-radius: var(--raio); padding: .8rem 1rem; font-size: .95rem; }
+.escolhas { display: flex; flex-wrap: wrap; gap: .5rem; }
 
 
 
@@ -554,56 +553,16 @@ details.votos[open] > * + * { margin-top: .6rem; }
   var chaves = Object.keys(pessoas).sort(function (a, b) { return pessoas[a].nome.localeCompare(pessoas[b].nome, "pt-BR"); });
   var totCam = ((K.camara || {}).votacoes || []).length, simbCam = totCam - ((K.camara || {}).votacoes || []).filter(function (v) { return v.votos && v.votos.length; }).length;
   var sv = secao("parlamentares", "Consultar um parlamentar", chaves.length ? "Digite o nome de qualquer deputado federal ou senador em exercício para ver o que ele fez na semana: votos, discursos, proposições apresentadas e gastos da cota parlamentar." : null);
-  var amostra = null;
-  if (window.claude && window.claude.use) window.claude.use("sample").then(function (f) { amostra = f; document.querySelectorAll(".ia, .ia-nota").forEach(function (b) { b.hidden = !f; }); }).catch(function () {});
   function cotaDe(p) {
     if (p.casa === "Câmara") { var c = ceap && ceap.por_deputado && ceap.por_deputado[normaliza(p.nome)]; return c ? { texto: brl(c[0]) + " em " + ceap.mes + " (" + c[1] + "º de " + ceap.deputados_com_gasto + "; média da Câmara " + brl(ceap.media) + ")", valor: c[0], periodo: ceap.mes, posicao: c[1], media: ceap.media } : null; }
     var v = ATS.ceaps_ano && ATS.ceaps_ano[p.id]; return v != null ? { texto: brl(v) + " no acumulado de " + ATS.ano_ceaps, valor: v, periodo: "ano de " + ATS.ano_ceaps } : null;
   }
-  function dadosParaIA(p) {
-    var c = cotaDe(p);
-    return {
-      parlamentar: p.nome, partido: p.partido, uf: p.uf, casa: p.casa === "Câmara" ? "Câmara dos Deputados" : "Senado Federal",
-      semana: { inicio: sem.inicio, fim: sem.fim },
-      votacoes_nominais: p.votos.map(function (r) { var v = r.v; return { data: v.data, proposta: p.casa === "Câmara" ? v.proposicao.sigla : v.materia, descricao: v.descricao, voto: r.voto || "não consta voto", orientacao_do_partido: p.casa === "Câmara" ? orientacaoDe(v.orientacoes, p.partido) : null, resultado: p.casa === "Câmara" ? (v.aprovacao === 1 ? "aprovada" : v.aprovacao === 0 ? "rejeitada" : null) : v.resultado }; }),
-      discursos: p.discursos.map(function (d) { return { data: d[0], tipo: d[1], fase: d[2], resumo: d[3] }; }),
-      proposicoes_apresentadas: p.props.map(function (x) { return { tipo: x[0], numero: x[1], ano: x[2], data: x[3], ementa: x[4] }; }),
-      cota_parlamentar: c ? { valor: c.valor, periodo: c.periodo, posicao: c.posicao || null, media_da_casa: c.media || null } : null,
-      votacoes_simbolicas_na_camara_sem_voto_individual: p.casa === "Câmara" ? simbCam : null
-    };
-  }
-  var ERROS_IA = { not_granted: "O resumo com IA não foi permitido nesta página.", sampling_disabled: "O Claude não está disponível nesta conta.", rate_limited: "Muitos pedidos em pouco tempo ou limite de uso atingido. Tente de novo mais tarde.", session_expired: "Sua sessão expirou. Entre de novo no claude.ai.", refused: "O Claude não gerou o resumo para estes dados.", empty_completion: "O Claude não devolveu texto. Tente de novo.", prompt_too_large: "Há dados demais para resumir de uma vez." };
   function cartao(p) {
     var cota = cotaDe(p), votou = p.votos.filter(function (r) { return r.voto; }).length;
     var box = el("article", { class: "parlamentar" }, [
       el("h3", { text: p.nome + " (" + p.partido + "-" + p.uf + ") · " + (p.casa === "Câmara" ? "deputado federal" : "senador") }),
       el("p", { class: "nota", text: [p.votos.length ? "votou em " + votou + " de " + p.votos.length + " votações nominais" : "nenhuma votação nominal na " + (p.casa === "Câmara" ? "Câmara" : "Senado"), p.discursos.length + (p.discursos.length === 1 ? " discurso" : " discursos"), p.props.length + (p.props.length === 1 ? " proposição apresentada" : " proposições apresentadas"), cota ? "cota: " + cota.texto : null].filter(Boolean).join(" · ") })
     ]);
-    // Resumo com IA: só aparece quando a página pode perguntar ao Claude
-    var btn = el("button", { type: "button", class: "botao ia", id: "ia-" + p.k.replace(/[^A-Za-z0-9]/g, "-") }, ["Resumir com IA"]);
-    var parar = el("button", { type: "button", class: "botao secundario", hidden: "hidden" }, ["Parar"]);
-    var saida = el("div", { class: "resumo-ia", "aria-live": "polite", hidden: "hidden" });
-    btn.hidden = !amostra;
-    var ctl = null;
-    parar.addEventListener("click", function () { if (ctl) ctl.abort(); });
-    btn.addEventListener("click", function () {
-      if (!amostra) return;
-      ctl = new AbortController();
-      btn.disabled = true; parar.hidden = false; saida.hidden = false; saida.textContent = "Pensando…";
-      var prompt = "Resuma em português do Brasil o que este parlamentar fez na semana, usando SOMENTE os dados em JSON abaixo, que vêm das fontes oficiais da Câmara e do Senado. Regras: escreva de 3 a 6 tópicos curtos, cada um numa linha começando com \"- \"; não use conhecimento de fora dos dados; não dê opinião nem use adjetivos de julgamento; copie números e datas exatamente como estão; quando um tipo de atividade não aparecer nos dados (por exemplo, nenhum discurso), diga isso; \"não consta voto\" significa que o voto não foi registrado, sem dizer por quê; votos contra a orientação do partido devem ser citados de forma neutra. Não escreva título nem conclusão.\n\nDADOS:\n" + JSON.stringify(dadosParaIA(p));
-      amostra(prompt, { signal: ctl.signal, onText: function (u) { saida.textContent = u.text; } })
-        .then(function (r) { saida.textContent = r.text + (r.truncated ? "\n\n(Resumo interrompido.)" : ""); })
-        .catch(function (e) {
-          saida.textContent = (e && e.text) || "";
-          if (e && e.code === "cancelled") { if (!saida.textContent) saida.hidden = true; return; }
-          if (e && (e.code === "not_granted" || e.code === "sampling_disabled")) document.querySelectorAll(".ia, .ia-nota").forEach(function (b) { b.hidden = true; });
-          saida.appendChild(el("p", { class: "nota", text: ERROS_IA[e && e.code] || "Não foi possível gerar o resumo agora. Tente de novo." }));
-        })
-        .then(function () { btn.disabled = false; parar.hidden = true; });
-    });
-    box.appendChild(el("div", { class: "acoes-ia" }, [btn, parar]));
-    box.appendChild(saida);
-    box.appendChild(el("p", { class: "nota ia-nota", hidden: amostra ? null : "hidden", text: "O resumo é escrito pelo Claude só com os dados desta página e usa o seu limite de uso do Claude." }));
 
     if (p.votos.length) {
       var t = el("table", null, [el("thead", null, [el("tr", null, [el("th", { text: "Data" }), el("th", { text: "Proposta" }), el("th", { text: "Voto" })].concat(p.casa === "Câmara" ? [el("th", { text: "Partido orientou" })] : []).concat([el("th", { text: "Resultado" })]))])]);
@@ -638,7 +597,7 @@ details.votos[open] > * + * { margin-top: .6rem; }
     chaves.forEach(function (k) { var p = pessoas[k]; dl.appendChild(el("option", { value: p.nome, label: (p.casa === "Câmara" ? "Deputado" : "Senador") + " · " + p.partido + "-" + p.uf })); });
     var caixa = el("input", { type: "search", id: "busca-parlamentar", class: "filtro", list: "nomes-parlamentares", placeholder: "Ex.: nome do deputado ou senador", "aria-label": "Nome do parlamentar" });
     var res = el("div", { class: "resultados", id: "resultado-parlamentar", "aria-live": "polite" });
-    sv.appendChild(el("p", { class: "so-impressao", text: "Na página online do boletim, esta seção tem uma busca por nome com os votos, discursos, proposições e gastos de cada deputado e senador, e um resumo com IA. O voto de cada um também está no PDF \"Votos da semana\"." }));
+    sv.appendChild(el("p", { class: "so-impressao", text: "Na página online do boletim, esta seção tem uma busca por nome com os votos, discursos, proposições e gastos de cada deputado e senador. O voto de cada um também está no PDF \"Votos da semana\"." }));
     sv.appendChild(el("div", { class: "busca" }, [caixa, dl]));
     sv.appendChild(res);
     sv.appendChild(el("p", { class: "nota", text: "Nesta semana, a Câmara teve " + totCam + " votações no plenário: " + nominaisCam.length + " nominais, com o voto de cada deputado, e " + simbCam + " simbólicas, sem voto individual. O Senado teve " + votSen.length + " votações nominais. Discursos e proposições vêm dos dados abertos da Câmara e do Senado; no Senado, só os discursos do plenário." }));
