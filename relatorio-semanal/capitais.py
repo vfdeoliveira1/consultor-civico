@@ -27,7 +27,7 @@ SAO_PAULO_WS = "https://splegisws.saopaulo.sp.leg.br/ws/ws2.asmx"
 
 # Resultado do levantamento de 27/10/2026. Atualize quando uma câmara passar a responder.
 SEM_COBERTURA = [
-    ["BA", "Salvador", "sistema legislativo num servidor sem nome de domínio (45.4.247.157), que precisa ser liberado na rede do ambiente"],
+    ["BA", "Salvador", "o sistema legislativo só tem endereço numérico (45.4.247.157), que a rede do ambiente não permite liberar"],
     ["DF", "Câmara Legislativa do DF", "o site recusa conexões vindas da nuvem"],
     ["RJ", "Rio de Janeiro", "certificado de segurança incompleto no site"],
     ["MG", "Belo Horizonte", "sem dados abertos; só páginas para leitura"],
