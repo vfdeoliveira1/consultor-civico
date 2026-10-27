@@ -28,6 +28,10 @@ const IMPRESSAO = `
   table { font-size: 9pt !important; }
   th { white-space: normal !important; }
   a { color: inherit !important; text-decoration-color: #9bb; }
+  /* Busca e votos individuais só existem na página online; no PDF ficam o placar e a orientação. */
+  #como-votou .intro, #como-votou .busca, #como-votou .resultados, details.votos { display: none !important; }
+  .so-impressao { display: block !important; }
+  .votacao { break-inside: avoid; }
 `;
 
 async function main() {

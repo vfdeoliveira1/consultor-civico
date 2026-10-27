@@ -1,15 +1,34 @@
 {
   "_aviso": "Arquivo de exemplo: mostra o formato do conteudo.json. Os textos são fictícios e não devem ser publicados.",
   "destaques": [
-    {"texto": "EXEMPLO. Copom manteve a Selic em 13,75% e sinalizou novos cortes.", "link": "economia"},
-    {"texto": "EXEMPLO. Câmara aprovou projeto que muda regras do saque do FGTS; texto vai ao Senado.", "link": "congresso"},
-    {"texto": "EXEMPLO. Sandro Filho anunciou que pretende integrar a Comissão de Educação a partir de 2027.", "link": "deputados"}
+    {
+      "texto": "EXEMPLO. Copom manteve a Selic em 13,75% e sinalizou novos cortes.",
+      "link": "economia"
+    },
+    {
+      "texto": "EXEMPLO. Câmara aprovou projeto que muda regras do saque do FGTS; texto vai ao Senado.",
+      "link": "congresso"
+    },
+    {
+      "texto": "EXEMPLO. Sandro Filho anunciou que pretende integrar a Comissão de Educação a partir de 2027.",
+      "link": "deputados"
+    }
   ],
   "economia": {
     "intro": "EXEMPLO. Inflação desacelerou e o mercado reduziu a projeção para a Selic no fim do ano.",
     "analise": "EXEMPLO. Primeiro parágrafo da análise, explicando o que mudou na semana.\n\nEXEMPLO. Segundo parágrafo, com o que esperar da próxima semana.",
     "fatos": [
-      {"titulo": "EXEMPLO. IPCA-15 de outubro", "data": "2026-10-23", "texto": "EXEMPLO. Resultado e principais grupos.", "fontes": [{"nome": "IBGE", "url": "https://www.ibge.gov.br"}]}
+      {
+        "titulo": "EXEMPLO. IPCA-15 de outubro",
+        "data": "2026-10-23",
+        "texto": "EXEMPLO. Resultado e principais grupos.",
+        "fontes": [
+          {
+            "nome": "IBGE",
+            "url": "https://www.ibge.gov.br"
+          }
+        ]
+      }
     ]
   },
   "leis": [
@@ -20,7 +39,12 @@
       "casa": "Presidência da República",
       "texto": "EXEMPLO. Resumo do que a lei faz.",
       "o_que_muda": "EXEMPLO. Escolas passam a ser obrigadas a afixar cartazes.",
-      "fontes": [{"nome": "normas.leg.br", "url": "https://normas.leg.br"}]
+      "fontes": [
+        {
+          "nome": "normas.leg.br",
+          "url": "https://normas.leg.br"
+        }
+      ]
     }
   ],
   "congresso": {
@@ -31,8 +55,16 @@
         "status": "em tramitação",
         "casa": "Senado",
         "texto": "EXEMPLO. Contexto do adiamento.",
-        "lados": {"a": "EXEMPLO. Argumento de quem defende.", "b": "EXEMPLO. Argumento de quem critica."},
-        "fontes": [{"nome": "Agência Senado", "url": "https://www12.senado.leg.br/noticias"}]
+        "lados": {
+          "a": "EXEMPLO. Argumento de quem defende.",
+          "b": "EXEMPLO. Argumento de quem critica."
+        },
+        "fontes": [
+          {
+            "nome": "Agência Senado",
+            "url": "https://www12.senado.leg.br/noticias"
+          }
+        ]
       }
     ]
   },
@@ -45,10 +77,33 @@
       "status": "Eleito",
       "chave_ceap": "",
       "fatos": [
-        {"tipo": "registro", "texto": "EXEMPLO. Declaração sobre as comissões que pretende integrar.", "fontes": [{"nome": "Veículo", "url": "https://exemplo.com.br"}]},
-        {"tipo": "entrega", "texto": "EXEMPLO. Projeto aprovado na Câmara Municipal de Salvador.", "fontes": [{"nome": "CMS", "url": "https://www.cms.ba.gov.br"}]}
+        {
+          "tipo": "registro",
+          "texto": "EXEMPLO. Declaração sobre as comissões que pretende integrar.",
+          "fontes": [
+            {
+              "nome": "Veículo",
+              "url": "https://exemplo.com.br"
+            }
+          ]
+        },
+        {
+          "tipo": "entrega",
+          "texto": "EXEMPLO. Projeto aprovado na Câmara Municipal de Salvador.",
+          "fontes": [
+            {
+              "nome": "CMS",
+              "url": "https://www.cms.ba.gov.br"
+            }
+          ]
+        }
       ],
-      "lados": {"a": "EXEMPLO. Como apoiadores avaliam.", "b": "EXEMPLO. Como críticos avaliam.", "rotulo_a": "Apoiadores dizem", "rotulo_b": "Críticos dizem"}
+      "lados": {
+        "a": "EXEMPLO. Como apoiadores avaliam.",
+        "b": "EXEMPLO. Como críticos avaliam.",
+        "rotulo_a": "Apoiadores dizem",
+        "rotulo_b": "Críticos dizem"
+      }
     },
     {
       "nome": "Paulo Câmara",
@@ -64,25 +119,143 @@
   "em_evidencia": {
     "criterio": "EXEMPLO. Deputados mais citados em reportagens de veículos de linhas diferentes entre 19 e 25/10.",
     "deputados": [
-      {"titulo": "EXEMPLO. Deputado A (PARTIDO-UF): discurso viralizou", "texto": "EXEMPLO. O que aconteceu.", "lados": {"a": "EXEMPLO.", "b": "EXEMPLO."}, "fontes": [{"nome": "Veículo", "url": "https://exemplo.com.br"}]}
+      {
+        "titulo": "EXEMPLO. Deputado A (PARTIDO-UF): discurso viralizou",
+        "texto": "EXEMPLO. O que aconteceu.",
+        "lados": {
+          "a": "EXEMPLO.",
+          "b": "EXEMPLO."
+        },
+        "fontes": [
+          {
+            "nome": "Veículo",
+            "url": "https://exemplo.com.br"
+          }
+        ]
+      }
     ]
   },
-  "executivo": [
-    {"titulo": "EXEMPLO. Decreto regulamenta programa Y", "data": "2026-10-21", "status": "editada", "texto": "EXEMPLO.", "fontes": [{"nome": "Diário Oficial da União", "url": "https://www.in.gov.br"}]}
-  ],
+  "presidente": {
+    "intro": "EXEMPLO. Semana com duas sanções e uma medida provisória.",
+    "sancoes": [
+      {
+        "titulo": "EXEMPLO. Lei Complementar X/2026, sobre o MEI",
+        "status": "sancionada",
+        "data": "2026-10-21",
+        "texto": "EXEMPLO. O que a lei faz.",
+        "o_que_muda": "EXEMPLO. O teto passa de A para B.",
+        "fontes": [
+          {
+            "nome": "normas.leg.br",
+            "url": "https://normas.leg.br"
+          }
+        ]
+      }
+    ],
+    "vetos": [
+      {
+        "titulo": "EXEMPLO. Veto parcial ao PL Y",
+        "status": "veto parcial",
+        "data": "2026-10-22",
+        "texto": "EXEMPLO. Trechos vetados e a justificativa.",
+        "lados": {
+          "a": "EXEMPLO. Quem apoia o veto.",
+          "b": "EXEMPLO. Quem quer derrubá-lo."
+        },
+        "fontes": [
+          {
+            "nome": "Senado",
+            "url": "https://www12.senado.leg.br/noticias"
+          }
+        ]
+      }
+    ],
+    "mps": [
+      {
+        "titulo": "EXEMPLO. MP Z/2026 abre crédito extraordinário",
+        "status": "editada",
+        "data": "2026-10-20",
+        "texto": "EXEMPLO.",
+        "fontes": [
+          {
+            "nome": "Diário Oficial da União",
+            "url": "https://www.in.gov.br"
+          }
+        ]
+      }
+    ],
+    "decretos": [
+      {
+        "titulo": "EXEMPLO. Decreto regulamenta programa Y",
+        "data": "2026-10-21",
+        "status": "editada",
+        "texto": "EXEMPLO.",
+        "fontes": [
+          {
+            "nome": "Diário Oficial da União",
+            "url": "https://www.in.gov.br"
+          }
+        ]
+      }
+    ],
+    "agenda": [
+      {
+        "titulo": "EXEMPLO. Viagem a Salvador para anúncio do Novo PAC",
+        "data": "2026-10-23",
+        "texto": "EXEMPLO.",
+        "fontes": [
+          {
+            "nome": "Planalto",
+            "url": "https://www.gov.br/planalto"
+          }
+        ]
+      }
+    ]
+  },
   "justica": [
-    {"titulo": "EXEMPLO. STF julga tema de repercussão geral Z", "data": "2026-10-22", "casa": "STF", "texto": "EXEMPLO.", "fontes": [{"nome": "STF", "url": "https://portal.stf.jus.br"}]}
+    {
+      "titulo": "EXEMPLO. STF julga tema de repercussão geral Z",
+      "data": "2026-10-22",
+      "casa": "STF",
+      "texto": "EXEMPLO.",
+      "fontes": [
+        {
+          "nome": "STF",
+          "url": "https://portal.stf.jus.br"
+        }
+      ]
+    }
   ],
   "bahia": [
-    {"titulo": "EXEMPLO. Repasse federal para obra em Salvador", "texto": "EXEMPLO.", "fontes": [{"nome": "Veículo", "url": "https://exemplo.com.br"}]}
+    {
+      "titulo": "EXEMPLO. Repasse federal para obra em Salvador",
+      "texto": "EXEMPLO.",
+      "fontes": [
+        {
+          "nome": "Veículo",
+          "url": "https://exemplo.com.br"
+        }
+      ]
+    }
   ],
   "agenda": [
-    {"data": "2026-11-04", "evento": "EXEMPLO. Reunião do Copom", "onde": "Banco Central"}
+    {
+      "data": "2026-11-04",
+      "evento": "EXEMPLO. Reunião do Copom",
+      "onde": "Banco Central"
+    }
   ],
   "tema_da_semana": {
     "titulo": "EXEMPLO. o que é o juro real",
     "texto": "EXEMPLO. Primeiro parágrafo.\n\nEXEMPLO. Segundo parágrafo.",
-    "fontes": [{"nome": "Lei Complementar 179/2021", "url": "https://normas.leg.br/?urn=urn:lex:br:federal:lei.complementar:2021-02-24;179"}]
+    "fontes": [
+      {
+        "nome": "Lei Complementar 179/2021",
+        "url": "https://normas.leg.br/?urn=urn:lex:br:federal:lei.complementar:2021-02-24;179"
+      }
+    ]
   },
-  "avisos": ["EXEMPLO. O site do IBGE recusou a conexão; o desemprego veio da série do Banco Central."]
+  "avisos": [
+    "EXEMPLO. O site do IBGE recusou a conexão; o desemprego veio da série do Banco Central."
+  ]
 }

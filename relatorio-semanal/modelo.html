@@ -63,7 +63,7 @@ p { margin: 0; }
 /* Seções */
 section { display: flex; flex-direction: column; gap: 1.25rem; scroll-margin-top: 1rem; }
 .secao-topo { display: flex; align-items: baseline; gap: .75rem; border-bottom: 1px solid var(--linha); padding-bottom: .5rem; }
-.secao-topo .par { font-family: var(--f-dado); color: var(--acento); font-size: .95rem; }
+.secao-topo .par { font-family: var(--f-dado); color: var(--acento); font-size: .95rem; white-space: nowrap; }
 .secao-topo h2 { font-size: 1.55rem; font-weight: 700; font-stretch: 88%; }
 .intro { color: var(--tinta-2); }
 h3 { font-size: 1.12rem; font-weight: 700; font-stretch: 92%; }
@@ -132,6 +132,24 @@ td.n, th.n { text-align: right; font-family: var(--f-dado); font-variant-numeric
 .avisos { font-size: .9rem; color: var(--tinta-2); display: flex; flex-direction: column; gap: .3rem; padding-left: 1.1rem; margin: 0; }
 .rodape { font-size: .85rem; color: var(--tinta-2); border-top: 1px solid var(--linha); padding-top: 1rem; display: flex; flex-direction: column; gap: .4rem; }
 .vazio { color: var(--tinta-2); font-style: italic; }
+.so-impressao { display: none; }
+/* Votações */
+.votacao { background: var(--folha); border: 1px solid var(--linha); border-radius: var(--raio); padding: .9rem 1rem; display: flex; flex-direction: column; gap: .45rem; min-width: 0; overflow-wrap: anywhere; }
+.votacao .meta { display: flex; flex-wrap: wrap; gap: .35rem .7rem; align-items: center; font-size: .9rem; }
+.votacao .descricao { font-size: .95rem; }
+.placar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--linha); }
+.placar i { display: block; height: 100%; }
+.placar .sim { background: var(--bom); } .placar .nao { background: var(--atencao); } .placar .out { background: var(--neutro); opacity: .5; }
+details.votos { display: flex; flex-direction: column; gap: .6rem; }
+details.votos > summary { cursor: pointer; font-family: var(--f-titulo); font-weight: 600; font-size: .88rem; color: var(--acento); padding: .3rem 0; list-style-position: inside; }
+details.votos[open] > * + * { margin-top: .6rem; }
+.filtro { width: 100%; max-width: 26rem; font: inherit; font-size: .95rem; padding: .5rem .7rem; border: 1px solid var(--linha); border-radius: var(--raio); background: var(--folha); color: var(--tinta); }
+.filtro:focus-visible { outline: 2px solid var(--acento); outline-offset: 1px; }
+.lista-votos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: .25rem .9rem; font-size: .88rem; max-height: 22rem; overflow-y: auto; }
+.lista-votos li { display: flex; justify-content: space-between; gap: .5rem; padding: .2rem 0; border-bottom: 1px dotted var(--linha); min-width: 0; }
+.resultados { display: flex; flex-direction: column; gap: 1.2rem; }
+.parlamentar { display: flex; flex-direction: column; gap: .5rem; }
+
 
 @media (max-width: 520px) {
   .fatos li { grid-template-columns: 1fr; gap: .2rem; }
@@ -291,7 +309,7 @@ td.n, th.n { text-align: right; font-family: var(--f-dado); font-variant-numeric
   var ol = el("ol", { class: "destaques" });
   (C.destaques || []).forEach(function (d) {
     var txt = typeof d === "string" ? { texto: d } : d;
-    ol.appendChild(el("li", null, [el("div", null, [el("p", { text: txt.texto }), txt.link ? el("a", { href: "#" + txt.link, class: "nota", text: "Ver detalhes" }) : null])]));
+    ol.appendChild(el("li", null, [el("div", null, [el("p", { text: txt.texto }), txt.link ? el("a", { href: "#" + ({ "governo-justica": "presidente" }[txt.link] || txt.link), class: "nota", text: "Ver detalhes" }) : null])]));
   });
   s1.appendChild((C.destaques || []).length ? ol : el("p", { class: "vazio", text: "Sem destaques nesta edição." }));
 
@@ -367,25 +385,173 @@ td.n, th.n { text-align: right; font-family: var(--f-dado); font-variant-numeric
   var s3 = secao("congresso", "Congresso e leis", C.congresso && C.congresso.intro);
   if (C.leis && C.leis.length) { s3.appendChild(el("h3", { text: "Leis, vetos e medidas provisórias" })); s3.appendChild(itens(C.leis)); }
   if (C.congresso && C.congresso.itens && C.congresso.itens.length) { s3.appendChild(el("h3", { text: "Outros fatos do Congresso" })); s3.appendChild(itens(C.congresso.itens)); }
-  var vots = ((K.camara || {}).votacoes || []).filter(function (v) { return v.proposicao; });
-  var vistos = {}, linhas = [];
-  vots.forEach(function (v) { var k = v.proposicao.sigla; if (v.placar || !vistos[k]) { vistos[k] = 1; linhas.push(v); } });
-  if (linhas.length) {
-    var tv = el("table", null, [el("thead", null, [el("tr", null, [el("th", { text: "Data" }), el("th", { text: "Proposta" }), el("th", { text: "Resultado" }), el("th", { class: "n", text: "Sim × Não" })])])]);
+  /* Votações dos plenários: cartões com os votos de cada parlamentar */
+  var CAMARA_D = (K.camara || {}).deputados || {}, SENADO_S = (K.senado || {}).senadores || {};
+  function classeVoto(v) { return v === "Sim" ? "bom" : v === "Não" ? "atencao" : "neutro"; }
+  function porPartido(votos, cadastro) {
+    var g = {};
+    votos.forEach(function (x) {
+      var p = (cadastro[x[0]] || [])[1] || "s/ partido";
+      g[p] = g[p] || { sim: 0, nao: 0, outros: 0 };
+      if (x[1] === "Sim") g[p].sim++; else if (x[1] === "Não") g[p].nao++; else g[p].outros++;
+    });
+    return Object.keys(g).sort(function (a, b) { var ta = g[a].sim + g[a].nao + g[a].outros, tb = g[b].sim + g[b].nao + g[b].outros; return tb - ta || a.localeCompare(b); }).map(function (p) { return [p, g[p]]; });
+  }
+  function barraPlacar(pl) {
+    var sim = pl.sim || 0, nao = pl.nao || 0, out = (pl.abstencao || 0) + (pl.obstrucao || 0), t = sim + nao + out || 1;
+    return el("div", { class: "placar", role: "img", "aria-label": "Sim " + sim + ", Não " + nao + ", outros " + out }, [
+      el("i", { class: "sim", style: "width:" + (sim / t * 100).toFixed(1) + "%" }),
+      el("i", { class: "nao", style: "width:" + (nao / t * 100).toFixed(1) + "%" }),
+      el("i", { class: "out", style: "width:" + (out / t * 100).toFixed(1) + "%" })
+    ]);
+  }
+  var contVotacao = 0;
+  function cartaoVotacao(v, casa) {
+    var cadastro = casa === "Câmara" ? CAMARA_D : SENADO_S, quem = casa === "Câmara" ? "deputado" : "senador";
+    var sigla = casa === "Câmara" ? v.proposicao.sigla : v.materia, url = casa === "Câmara" ? v.proposicao.url : v.url;
+    var ementa = casa === "Câmara" ? v.proposicao.ementa : v.ementa;
+    var aprovada = casa === "Câmara" ? v.aprovacao === 1 : /aprovad/i.test(v.resultado || "");
+    var rejeitada = casa === "Câmara" ? v.aprovacao === 0 : /rejeitad/i.test(v.resultado || "");
+    var pl = v.placar || {};
+    var card = el("article", { class: "votacao" }, [
+      el("div", { class: "meta" }, [
+        el("span", { class: "dado", text: dataBR(v.data, { day: "2-digit", month: "2-digit" }) }),
+        url ? el("a", { href: url, target: "_blank", rel: "noopener", text: sigla }) : el("strong", { text: sigla }),
+        selo(aprovada ? "aprovada" : rejeitada ? "rejeitada" : "registro", aprovada || rejeitada ? null : (v.resultado || "Registro")),
+        el("span", { class: "num", text: "Sim " + (pl.sim || 0) + " · Não " + (pl.nao || 0) + ((pl.abstencao || pl.obstrucao) ? " · outros " + ((pl.abstencao || 0) + (pl.obstrucao || 0)) : "") })
+      ]),
+      el("p", { class: "descricao", text: v.descricao || "" }),
+      ementa ? el("p", { class: "nota", text: ementa.length > 220 ? ementa.slice(0, 220) + "…" : ementa }) : null,
+      barraPlacar(pl)
+    ]);
+    if (casa === "Câmara" && v.orientacoes) {
+      var gov = Object.keys(v.orientacoes).filter(function (k) { return /^(Governo|Oposição|Oposicao|Maioria|Minoria)/i.test(k) && v.orientacoes[k]; });
+      if (gov.length) card.appendChild(el("p", { class: "nota", text: "Orientação: " + gov.map(function (k) { return k + " " + v.orientacoes[k].toLowerCase(); }).join(" · ") }));
+    }
+    if (v.secreta) { card.appendChild(el("p", { class: "nota", text: "Votação secreta: o Senado não divulga o voto de cada senador." })); return card; }
+    if (!v.votos || !v.votos.length) return card;
+    var id = "votos-" + (++contVotacao);
+    var det = el("details", { class: "votos" });
+    det.appendChild(el("summary", { text: "Ver como votou cada " + quem + " (" + v.votos.length + ")" }));
+    var tp = el("table", null, [el("thead", null, [el("tr", null, [el("th", { text: "Partido" }), el("th", { class: "n", text: "Sim" }), el("th", { class: "n", text: "Não" }), el("th", { class: "n", text: "Outros" })].concat(casa === "Câmara" ? [el("th", { text: "Orientação" })] : []))])]);
+    var tbp = el("tbody");
+    porPartido(v.votos, cadastro).forEach(function (r) {
+      var o = casa === "Câmara" ? orientacaoDe(v.orientacoes, r[0]) : null;
+      tbp.appendChild(el("tr", null, [el("td", { text: r[0] }), el("td", { class: "n", text: r[1].sim }), el("td", { class: "n", text: r[1].nao }), el("td", { class: "n", text: r[1].outros })].concat(casa === "Câmara" ? [el("td", { text: o || "—" })] : [])));
+    });
+    tp.appendChild(tbp);
+    det.appendChild(el("div", { class: "tabela" }, [tp]));
+    if (casa === "Câmara") det.appendChild(el("p", { class: "nota", text: "Orientação \"—\": o partido liberou a bancada ou orientou só como parte de um bloco, que a Câmara publica com nome abreviado." }));
+    var filtro = el("input", { type: "search", id: id + "-filtro", class: "filtro", placeholder: "Filtrar por nome, partido ou UF", "aria-label": "Filtrar votos desta votação" });
+    var lista = el("ul", { class: "lista-votos", id: id + "-lista" });
+    det.appendChild(filtro); det.appendChild(lista);
+    // A lista com centenas de nomes só é montada quando o leitor abre o painel.
+    det.addEventListener("toggle", function () {
+      if (!det.open || lista.childNodes.length) return;
+      v.votos.map(function (x) { var c = cadastro[x[0]] || ["?", "", ""]; return [c[0], c[1], c[2], x[1]]; })
+        .sort(function (a, b) { return a[0].localeCompare(b[0], "pt-BR"); })
+        .forEach(function (r) {
+          lista.appendChild(el("li", { "data-busca": normaliza(r.join(" ")) }, [el("span", { text: r[0] + " (" + r[1] + "-" + r[2] + ")" }), el("span", { class: "selo " + classeVoto(r[3]), text: r[3] || "—" })]));
+        });
+    });
+    filtro.addEventListener("input", function () {
+      var q = normaliza(filtro.value);
+      Array.prototype.forEach.call(lista.childNodes, function (li) { li.hidden = q && li.getAttribute("data-busca").indexOf(q) < 0; });
+    });
+    card.appendChild(det);
+    return card;
+  }
+  // A Câmara orienta por partido, federação ("Fdr PT-PCdoB-PV") ou bloco; procura a que inclui o partido.
+  function orientacaoDe(orient, partido) {
+    if (!orient || !partido) return null;
+    if (orient[partido]) return orient[partido];
+    var P = normaliza(partido);
+    for (var k in orient) {
+      if (!orient[k]) continue;
+      var membros = normaliza(k.replace(/^(Fdr|Bloco)\s+/i, "")).split(/[-\/ ,]+/);
+      if (membros.indexOf(P) >= 0) return orient[k];
+    }
+    return null;
+  }
+  function normaliza(t) { return String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+
+  var votCam = ((K.camara || {}).votacoes || []).filter(function (v) { return v.proposicao; });
+  var nominaisCam = votCam.filter(function (v) { return v.votos && v.votos.length; });
+  var vistos = {}, simbolicas = [];
+  votCam.forEach(function (v) { if (!(v.votos && v.votos.length) && !vistos[v.proposicao.sigla]) { vistos[v.proposicao.sigla] = 1; simbolicas.push(v); } });
+  var votSen = (K.senado || {}).votacoes || [];
+  s3.appendChild(el("h3", { text: "Votações nominais no plenário da Câmara" }));
+  if (nominaisCam.length) { var bc = el("div", { class: "itens" }); nominaisCam.forEach(function (v) { bc.appendChild(cartaoVotacao(v, "Câmara")); }); s3.appendChild(bc); }
+  else s3.appendChild(el("p", { class: "vazio", text: "Nenhuma votação nominal no plenário da Câmara nesta semana." }));
+  if (simbolicas.length) {
+    var tv = el("table", null, [el("thead", null, [el("tr", null, [el("th", { text: "Data" }), el("th", { text: "Proposta" }), el("th", { text: "Resultado" })])])]);
     var tbv = el("tbody");
-    linhas.slice(0, 25).forEach(function (v) {
+    simbolicas.slice(0, 25).forEach(function (v) {
       tbv.appendChild(el("tr", null, [
         el("td", { class: "dado", text: dataBR(v.data, { day: "2-digit", month: "2-digit" }) }),
         el("td", null, [el("a", { href: v.proposicao.url, target: "_blank", rel: "noopener", text: v.proposicao.sigla }), el("div", { class: "nota", text: (v.proposicao.ementa || "").slice(0, 160) + ((v.proposicao.ementa || "").length > 160 ? "…" : "") })]),
-        el("td", null, [selo(v.aprovacao === 1 ? "aprovada" : v.aprovacao === 0 ? "rejeitada" : "registro", v.aprovacao == null ? "Registro" : null)]),
-        el("td", { class: "n", text: v.placar ? v.placar.sim + " × " + v.placar.nao : "simbólica" })
+        el("td", null, [selo(v.aprovacao === 1 ? "aprovada" : v.aprovacao === 0 ? "rejeitada" : "registro", v.aprovacao == null ? "Registro" : null)])
       ]));
     });
     tv.appendChild(tbv);
-    s3.appendChild(el("h3", { text: "Votações no plenário da Câmara" }));
+    s3.appendChild(el("h3", { text: "Votações simbólicas na Câmara" }));
     s3.appendChild(el("div", { class: "tabela" }, [tv]));
-    s3.appendChild(el("p", { class: "nota", text: "Votação simbólica é aprovada sem registro de voto individual. Fonte: Câmara dos Deputados, dados abertos." }));
+    s3.appendChild(el("p", { class: "nota", text: "Na votação simbólica, o presidente da sessão anuncia o resultado sem registrar o voto de cada deputado. Fonte: Câmara dos Deputados, dados abertos." }));
   }
+  s3.appendChild(el("h3", { text: "Votações nominais no plenário do Senado" }));
+  if (votSen.length) { var bs = el("div", { class: "itens" }); votSen.forEach(function (v) { bs.appendChild(cartaoVotacao(v, "Senado")); }); s3.appendChild(bs); s3.appendChild(el("p", { class: "nota", text: "Fonte: Senado Federal, dados abertos, consultados pelo servidor MCP senado-br." })); }
+  else s3.appendChild(el("p", { class: "vazio", text: K.senado ? "Nenhuma votação nominal no plenário do Senado nesta semana." : "As votações do Senado não foram coletadas nesta edição." }));
+
+  /* Como votou: busca por nome em todas as votações nominais da semana */
+  var indice = {};
+  function indexar(lista, casa, cadastro) {
+    lista.forEach(function (v) {
+      (v.votos || []).forEach(function (x) {
+        var c = cadastro[x[0]]; if (!c) return;
+        var k = casa + ":" + x[0];
+        indice[k] = indice[k] || { nome: c[0], partido: c[1], uf: c[2], casa: casa, votos: [] };
+        indice[k].votos.push({ v: v, voto: x[1] });
+      });
+    });
+  }
+  indexar(nominaisCam, "Câmara", CAMARA_D); indexar(votSen, "Senado", SENADO_S);
+  var chaves = Object.keys(indice);
+  var sv = secao("como-votou", "Como votou cada parlamentar", chaves.length ? "Digite o nome de um deputado federal ou senador para ver o voto dele em cada votação nominal da semana." : null);
+  if (chaves.length) {
+    var dl = el("datalist", { id: "nomes-parlamentares" });
+    chaves.sort(function (a, b) { return indice[a].nome.localeCompare(indice[b].nome, "pt-BR"); }).forEach(function (k) { var p = indice[k]; dl.appendChild(el("option", { value: p.nome, label: (p.casa === "Câmara" ? "Deputado" : "Senador") + " · " + p.partido + "-" + p.uf })); });
+    var caixa = el("input", { type: "search", id: "busca-parlamentar", class: "filtro", list: "nomes-parlamentares", placeholder: "Ex.: nome do deputado ou senador", "aria-label": "Nome do parlamentar" });
+    var res = el("div", { class: "resultados", id: "resultado-parlamentar", "aria-live": "polite" });
+    sv.appendChild(el("p", { class: "so-impressao", text: "Na página online do boletim, esta seção tem uma busca por nome com o voto de cada deputado e senador, e cada votação mostra os votos por partido e por parlamentar. No PDF ficam o placar e a orientação de cada votação." }));
+    sv.appendChild(el("div", { class: "busca" }, [caixa, dl]));
+    sv.appendChild(res);
+    sv.appendChild(el("p", { class: "nota", text: chaves.length + " parlamentares com voto registrado em " + (nominaisCam.length + votSen.length) + " votações nominais. Votações simbólicas e secretas não têm voto individual." }));
+    var mostrar = function () {
+      var q = normaliza(caixa.value.trim());
+      res.innerHTML = "";
+      if (q.length < 3) return;
+      var achados = chaves.filter(function (k) { return normaliza(indice[k].nome).indexOf(q) >= 0; }).slice(0, 5);
+      if (!achados.length) { res.appendChild(el("p", { class: "vazio", text: "Nenhum parlamentar com esse nome votou nas votações nominais da semana." })); return; }
+      achados.forEach(function (k) {
+        var p = indice[k];
+        var t = el("table", null, [el("thead", null, [el("tr", null, [el("th", { text: "Data" }), el("th", { text: "Proposta" }), el("th", { text: "Voto" })].concat(p.casa === "Câmara" ? [el("th", { text: "Partido orientou" })] : []).concat([el("th", { text: "Resultado" })]))])]);
+        var tb = el("tbody");
+        p.votos.forEach(function (r) {
+          var v = r.v, sig = p.casa === "Câmara" ? v.proposicao.sigla : v.materia;
+          var o = p.casa === "Câmara" ? orientacaoDe(v.orientacoes, p.partido) : null;
+          var contra = o && (o === "Sim" || o === "Não") && (r.voto === "Sim" || r.voto === "Não") && o !== r.voto;
+          tb.appendChild(el("tr", null, [
+            el("td", { class: "dado", text: dataBR(v.data, { day: "2-digit", month: "2-digit" }) }),
+            el("td", null, [el("strong", { text: sig }), el("div", { class: "nota", text: v.descricao || "" })]),
+            el("td", null, [el("span", { class: "selo " + classeVoto(r.voto), text: r.voto || "—" }), contra ? el("div", { class: "nota", text: "contra o partido" }) : null])
+          ].concat(p.casa === "Câmara" ? [el("td", { text: o || "—" })] : []).concat([el("td", { text: p.casa === "Câmara" ? (v.aprovacao === 1 ? "Aprovada" : v.aprovacao === 0 ? "Rejeitada" : "—") : (v.resultado || "—") })])));
+        });
+        t.appendChild(tb);
+        res.appendChild(el("div", { class: "parlamentar" }, [el("h3", { text: p.nome + " (" + p.partido + "-" + p.uf + ") · " + (p.casa === "Câmara" ? "deputado federal" : "senador") }), el("div", { class: "tabela" }, [t])]));
+      });
+    };
+    caixa.addEventListener("input", mostrar);
+  } else sv.appendChild(el("p", { class: "vazio", text: "Não houve votação nominal na Câmara nem no Senado nesta semana, então não há votos individuais para consultar." }));
 
   /* §4 Deputados acompanhados */
   var s4 = secao("deputados", "Deputados que você acompanha", "Fatos verificáveis da semana. Entrega e ponto de atenção seguem critérios fixos, explicados no rodapé; a avaliação política fica para os dois lados.");
@@ -426,12 +592,28 @@ td.n, th.n { text-align: right; font-family: var(--f-dado); font-variant-numeric
     s5.appendChild(el("p", { class: "nota" }, ["Média entre os " + ceap.deputados_com_gasto + " deputados com gastos no mês: " + brl(ceap.media) + ". Gasto alto não é irregularidade: a cota varia por estado, e notas atrasadas mudam o total. Fonte: ", el("a", { href: ceap.fonte, target: "_blank", rel: "noopener", text: "Câmara, arquivo da cota parlamentar" }), "."]));
   }
 
-  /* §6 Governo e Justiça */
-  if ((C.executivo || []).length || (C.justica || []).length) {
-    var s6 = secao("governo-justica", "Governo federal e Justiça");
-    if ((C.executivo || []).length) { s6.appendChild(el("h3", { text: "Governo federal" })); s6.appendChild(itens(C.executivo)); }
-    if ((C.justica || []).length) { s6.appendChild(el("h3", { text: "STF e tribunais superiores" })); s6.appendChild(itens(C.justica)); }
+  /* §6 Presidente e governo federal */
+  var P = C.presidente || {}, vetos = (K.senado || {}).vetos;
+  var gruposPres = [["sancoes", "Leis sancionadas"], ["vetos", "Vetos da semana"], ["mps", "Medidas provisórias"], ["decretos", "Decretos e outros atos"], ["agenda", "Agenda e anúncios"]];
+  var temPres = gruposPres.some(function (g) { return (P[g[0]] || []).length; }) || (C.executivo || []).length || (vetos && vetos.lista && vetos.lista.length);
+  if (temPres) {
+    var s6 = secao("presidente", "Presidente e governo federal", P.intro);
+    gruposPres.forEach(function (g) { if ((P[g[0]] || []).length) { s6.appendChild(el("h3", { text: g[1] })); s6.appendChild(itens(P[g[0]])); } });
+    if ((C.executivo || []).length) { s6.appendChild(el("h3", { text: "Outros atos do governo" })); s6.appendChild(itens(C.executivo)); }
+    if (vetos && vetos.lista && vetos.lista.length) {
+      var tvt = el("table", null, [el("thead", null, [el("tr", null, [el("th", { text: "Veto" }), el("th", { text: "Tipo" }), el("th", { text: "Prazo" }), el("th", { text: "Sobre" })])])]), tbt = el("tbody");
+      vetos.lista.slice(0, 8).forEach(function (x) {
+        tbt.appendChild(el("tr", null, [el("td", { class: "dado", style: "white-space:nowrap", text: x.identificacao || "" }), el("td", { text: x.tipo || "" }), el("td", { class: "dado", text: x.prazo ? dataBR(x.prazo) : "—" }), el("td", { class: "nota", text: (x.ementa || "").length > 160 ? x.ementa.slice(0, 160) + "…" : (x.ementa || "") })]));
+      });
+      tvt.appendChild(tbt);
+      s6.appendChild(el("h3", { text: "Vetos à espera do Congresso" }));
+      s6.appendChild(el("div", { class: "tabela" }, [tvt]));
+      s6.appendChild(el("p", { class: "nota", text: vetos.total + " vetos presidenciais aguardam votação do Congresso; aqui, os 8 com prazo mais recente. Depois do prazo, o veto passa a trancar a pauta das sessões conjuntas. Fonte: Senado Federal, dados abertos." }));
+    }
   }
+
+  /* §7 Justiça */
+  if ((C.justica || []).length) { var s6j = secao("justica", "STF e tribunais superiores"); s6j.appendChild(itens(C.justica)); }
 
   /* §7 Bahia */
   if ((C.bahia || []).length) { var s7 = secao("bahia", "Bahia e Salvador, em resumo"); s7.appendChild(itens(C.bahia)); }
