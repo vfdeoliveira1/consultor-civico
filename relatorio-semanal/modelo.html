@@ -103,6 +103,7 @@ table { border-collapse: collapse; width: 100%; font-size: .92rem; }
 th, td { text-align: left; padding: .55rem .7rem; border-bottom: 1px solid var(--linha); vertical-align: top; }
 th { font-family: var(--f-titulo); font-size: .74rem; letter-spacing: .06em; text-transform: uppercase; color: var(--tinta-2); font-weight: 600; white-space: nowrap; }
 tr:last-child td { border-bottom: 0; }
+.comparacao td.var { color: var(--tinta-2); }
 td.n, th.n { text-align: right; font-family: var(--f-dado); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* Selos */
@@ -173,6 +174,9 @@ details.votos[open] > * + * { margin-top: .6rem; }
 
 
 @media (max-width: 520px) {
+  .comparacao th, .comparacao td { padding: .4rem .35rem; font-size: .78rem; }
+  .comparacao td.n, .comparacao th.n { white-space: normal; }
+  .comparacao th { letter-spacing: .02em; }
   .fatos li { grid-template-columns: 1fr; gap: .2rem; }
   body { font-size: 1rem; }
 }
@@ -338,6 +342,59 @@ details.votos[open] > * + * { margin-top: .6rem; }
     ol.appendChild(el("li", null, [el("div", null, [el("p", { text: txt.texto }), txt.link ? el("a", { href: "#" + ({ "governo-justica": "presidente" }[txt.link] || txt.link), class: "nota", text: "Ver detalhes" }) : null])]));
   });
   s1.appendChild((C.destaques || []).length ? ol : el("p", { class: "vazio", text: "Sem destaques nesta edição." }));
+
+  /* Comparação com a semana anterior: indicadores diários, Focus e atividade do Congresso */
+  (function () {
+    var CMP = K.comparacao || {}, F = (K.economia || {}).focus, Sx = (K.economia || {}).series || {};
+    var semAnt = CMP.semana_anterior;
+    if (!semAnt || !sem.fim) return;
+    function valorAte(serie, iso) {
+      var achado = null;
+      ((serie || {}).pontos || []).forEach(function (p) { if (p[0] <= iso) achado = p; });
+      return achado ? achado[1] : null;
+    }
+    function variacao(a, b, casas, sufixo) {
+      if (a == null || b == null) return "—";
+      // Variação dos números como aparecem na tabela, para "5,22% e 5,22%" não virar "▼ 0,01".
+      var f = Math.pow(10, casas), d = Math.round(a * f) / f - Math.round(b * f) / f;
+      if (Math.abs(d) < Math.pow(10, -casas) / 2) return "sem mudança";
+      return (d > 0 ? "▲\u00a0" : "▼\u00a0") + nf(Math.abs(d), casas) + (sufixo || "");
+    }
+    var linhas = [];
+    function linha(nome, atual, anterior, fmt, casas, sufixo) {
+      if (atual == null && anterior == null) return;
+      linhas.push([nome, atual == null ? "—" : fmt(atual), anterior == null ? "—" : fmt(anterior), typeof casas === "number" ? variacao(atual, anterior, casas, sufixo) : casas]);
+    }
+    var pct = function (c) { return function (v) { return nf(v, c) + "%"; }; };
+    linha("Meta Selic", valorAte(Sx.selic_meta, sem.fim), valorAte(Sx.selic_meta, semAnt.fim), pct(2), 2, "\u00a0p.p.");
+    var d1 = valorAte(Sx.dolar, sem.fim), d0 = valorAte(Sx.dolar, semAnt.fim);
+    linha("Dólar comercial", d1, d0, function (v) { return "R$\u00a0" + nf(v, 2); }, d1 != null && d0 != null ? (d1 === d0 ? "sem mudança" : (d1 > d0 ? "▲\u00a0" : "▼\u00a0") + nf(Math.abs(d1 / d0 - 1) * 100, 1) + "%") : "—");
+    if (F && F.anterior) {
+      var ano = F.anos[0], M = F.medianas, A = F.anterior.medianas;
+      var g = function (t, i) { return t[i] ? t[i][ano] : null; };
+      linha("Focus: IPCA " + ano, g(M, "IPCA"), g(A, "IPCA"), pct(2), 2, "\u00a0p.p.");
+      linha("Focus: Selic no fim de " + ano, g(M, "Selic"), g(A, "Selic"), pct(2), 2, "\u00a0p.p.");
+      linha("Focus: PIB " + ano, g(M, "PIB Total"), g(A, "PIB Total"), pct(2), 2, "\u00a0p.p.");
+      linha("Focus: dólar no fim de " + ano, g(M, "Câmbio"), g(A, "Câmbio"), function (v) { return "R$\u00a0" + nf(v, 2); }, 2);
+    }
+    var at = CMP.atual, an = CMP.anterior;
+    if (at && an) {
+      var num = function (v) { return String(v); }, dif = function (a, b) { return a === b ? "sem mudança" : (a > b ? "+" : "−") + Math.abs(a - b); };
+      linha("Votações no plenário da Câmara", at.camara_votacoes, an.camara_votacoes, num, dif(at.camara_votacoes, an.camara_votacoes));
+      linha("…das quais nominais", at.camara_nominais, an.camara_nominais, num, dif(at.camara_nominais, an.camara_nominais));
+      linha("Votações nominais no plenário do Senado", at.senado_nominais, an.senado_nominais, num, dif(at.senado_nominais, an.senado_nominais));
+      linha("Proposições apresentadas na Câmara", at.camara_proposicoes, an.camara_proposicoes, num, dif(at.camara_proposicoes, an.camara_proposicoes));
+    }
+    if (!linhas.length) return;
+    var curta = function (a, b) { return dataBR(a, { day: "2-digit", month: "2-digit" }) + " a " + dataBR(b, { day: "2-digit", month: "2-digit" }); };
+    var t = el("table", { class: "comparacao" }, [el("thead", null, [el("tr", null, [el("th", { text: "" }), el("th", { class: "n", text: "Esta semana" }), el("th", { class: "n", text: "Anterior" }), el("th", { class: "n", text: "Variação" })])])]);
+    var tb = el("tbody");
+    linhas.forEach(function (l) { tb.appendChild(el("tr", null, [el("td", { text: l[0] }), el("td", { class: "n", text: l[1] }), el("td", { class: "n", text: l[2] }), el("td", { class: "n var", text: l[3] })])); });
+    t.appendChild(tb);
+    s1.appendChild(el("h3", { text: "Em relação à semana anterior" }));
+    s1.appendChild(el("div", { class: "tabela" }, [t]));
+    s1.appendChild(el("p", { class: "nota", text: "Esta semana: " + curta(sem.inicio, sem.fim) + ". Anterior: " + curta(semAnt.inicio, semAnt.fim) + ". Selic e dólar: valor no último dia útil de cada semana (Banco Central, SGS). Focus: medianas das divulgações de " + (F && F.anterior ? dataBR(F.data) + " e " + dataBR(F.anterior.data) : "—") + ". Congresso: dados abertos da Câmara e do Senado. A variação não indica se a mudança é boa ou ruim." }));
+  })();
 
   /* §2 Economia */
   var s2 = secao("economia", "Economia", C.economia && C.economia.intro);
