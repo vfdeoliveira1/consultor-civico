@@ -56,9 +56,16 @@ p { margin: 0; }
 .cabecalho { padding-block: 2.5rem 1.5rem; border-bottom: 3px double var(--tinta); display: flex; flex-direction: column; gap: .6rem; }
 .cabecalho h1 { font-size: clamp(2.2rem, 7vw, 3.4rem); font-weight: 800; font-stretch: 80%; letter-spacing: -.01em; }
 .cabecalho .linha-edicao { display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; color: var(--tinta-2); font-size: .95rem; }
-.sumario { display: flex; flex-wrap: wrap; gap: .4rem .5rem; padding-top: .5rem; }
-.sumario a { font-family: var(--f-titulo); font-size: .82rem; font-weight: 600; text-decoration: none; color: var(--tinta); border: 1px solid var(--linha); border-radius: 999px; padding: .2rem .7rem; background: var(--folha); }
-.sumario a:hover { border-color: var(--acento); color: var(--acento); }
+/* Navegação por tópicos: a página mostra um tópico por vez; os botões abrem cada um. */
+.inicio { display: flex; flex-direction: column; gap: .9rem; }
+.topicos { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: .6rem; }
+.topicos a { display: flex; gap: .6rem; align-items: baseline; padding: .85rem 1rem; border: 1px solid var(--linha); border-radius: var(--raio); background: var(--folha); text-decoration: none; color: var(--tinta); font-family: var(--f-titulo); font-weight: 600; font-size: 1rem; line-height: 1.25; min-width: 0; }
+.topicos a .par { font-family: var(--f-dado); color: var(--acento); font-weight: 400; font-size: .85rem; white-space: nowrap; }
+.topicos a:hover { border-color: var(--acento); }
+.topicos a[aria-current="page"] { background: var(--acento-suave); border-color: var(--acento); }
+.topicos-fim { border-top: 3px double var(--tinta); padding-top: 1.2rem; display: flex; flex-direction: column; gap: .8rem; }
+.voltar { font-family: var(--f-titulo); font-weight: 600; font-size: .9rem; text-decoration: none; }
+section.inativa, .inicio.inativa { display: none; }
 
 /* Seções */
 section { display: flex; flex-direction: column; gap: 1.25rem; scroll-margin-top: 1rem; }
@@ -133,6 +140,11 @@ td.n, th.n { text-align: right; font-family: var(--f-dado); font-variant-numeric
 .rodape { font-size: .85rem; color: var(--tinta-2); border-top: 1px solid var(--linha); padding-top: 1rem; display: flex; flex-direction: column; gap: .4rem; }
 .vazio { color: var(--tinta-2); font-style: italic; }
 .so-impressao { display: none; }
+details.capital { background: var(--folha); border: 1px solid var(--linha); border-radius: var(--raio); padding: .6rem .9rem; display: flex; flex-direction: column; gap: .6rem; }
+details.capital > summary { cursor: pointer; font-family: var(--f-titulo); font-size: .98rem; }
+details.capital[open] > * + * { margin-top: .6rem; }
+.leis-capital { margin: 0; padding-left: 1.1rem; font-size: .92rem; display: flex; flex-direction: column; gap: .3rem; overflow-wrap: anywhere; }
+
 /* Votações */
 .votacao { background: var(--folha); border: 1px solid var(--linha); border-radius: var(--raio); padding: .9rem 1rem; display: flex; flex-direction: column; gap: .45rem; min-width: 0; overflow-wrap: anywhere; }
 .votacao .meta { display: flex; flex-wrap: wrap; gap: .35rem .7rem; align-items: center; font-size: .9rem; }
@@ -156,7 +168,7 @@ details.votos[open] > * + * { margin-top: .6rem; }
   body { font-size: 1rem; }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .sumario a { transition: border-color .15s, color .15s; }
+  .topicos a { transition: border-color .15s, background-color .15s; }
 }
 </style>
 
@@ -165,8 +177,11 @@ details.votos[open] > * + * { margin-top: .6rem; }
     <span class="rotulo">Boletim Cívico · política e economia federal</span>
     <h1 id="titulo">Boletim da semana</h1>
     <div class="linha-edicao" id="edicao"></div>
-    <nav class="sumario" id="sumario" aria-label="Seções"></nav>
   </header>
+  <nav class="inicio" id="inicio" aria-label="Tópicos do boletim">
+    <p class="intro">Escolha um tópico.</p>
+    <div class="topicos" id="sumario"></div>
+  </nav>
   <main class="coluna" id="conteudo"></main>
   <footer class="rodape" id="rodape"></footer>
 </div>
@@ -525,7 +540,8 @@ details.votos[open] > * + * { margin-top: .6rem; }
     sv.appendChild(el("p", { class: "so-impressao", text: "Na página online do boletim, esta seção tem uma busca por nome com o voto de cada deputado e senador, e cada votação mostra os votos por partido e por parlamentar. No PDF ficam o placar e a orientação de cada votação." }));
     sv.appendChild(el("div", { class: "busca" }, [caixa, dl]));
     sv.appendChild(res);
-    sv.appendChild(el("p", { class: "nota", text: chaves.length + " parlamentares com voto registrado em " + (nominaisCam.length + votSen.length) + " votações nominais. Votações simbólicas e secretas não têm voto individual." }));
+    var totCam = ((K.camara || {}).votacoes || []).length, simbCam = totCam - ((K.camara || {}).votacoes || []).filter(function (v) { return v.votos && v.votos.length; }).length;
+    sv.appendChild(el("p", { class: "nota", text: "Nesta semana, a Câmara teve " + totCam + " votações no plenário: " + nominaisCam.length + " nominais, com o voto de cada deputado, e " + simbCam + " simbólicas, sem voto individual. O Senado teve " + votSen.length + " votações nominais. A busca cobre as " + (nominaisCam.length + votSen.length) + " votações nominais, com " + chaves.length + " parlamentares." }));
     var mostrar = function () {
       var q = normaliza(caixa.value.trim());
       res.innerHTML = "";
@@ -615,6 +631,61 @@ details.votos[open] > * + * { margin-top: .6rem; }
   /* §7 Justiça */
   if ((C.justica || []).length) { var s6j = secao("justica", "STF e tribunais superiores"); s6j.appendChild(itens(C.justica)); }
 
+  /* Câmaras das capitais: projetos de lei e leis publicadas na semana */
+  var CAP = K.capitais;
+  if (CAP && CAP.camaras && CAP.camaras.length) {
+    var totProj = CAP.camaras.reduce(function (t, c) { return t + c.projetos.length; }, 0);
+    var sc = secao("capitais", "Câmaras das capitais", totProj + " projetos de lei apresentados em " + CAP.camaras.filter(function (c) { return c.projetos.length; }).length + " capitais com dados abertos. Indicações, moções e requerimentos aparecem só no total de cada câmara.");
+    var bv = el("input", { type: "search", id: "busca-vereador", class: "filtro", placeholder: "Buscar por vereador, cidade ou assunto", "aria-label": "Buscar projetos das câmaras das capitais" });
+    var rv = el("div", { class: "resultados", id: "resultado-vereador", "aria-live": "polite" });
+    sc.appendChild(el("p", { class: "so-impressao", text: "Na página online, cada capital abre a lista dos projetos com autor e link, e há uma busca por vereador ou assunto." }));
+    sc.appendChild(el("div", { class: "busca" }, [bv]));
+    sc.appendChild(rv);
+    var tabelaProjetos = function (lista, comCidade) {
+      var t = el("table", null, [el("thead", null, [el("tr", null, (comCidade ? [el("th", { text: "Cidade" })] : []).concat([el("th", { text: "Data" }), el("th", { text: "Projeto" }), el("th", { text: "Autoria" })]))])]);
+      var tb = el("tbody");
+      lista.forEach(function (pp) {
+        var p = pp.p || pp;
+        tb.appendChild(el("tr", null, (comCidade ? [el("td", { text: pp.cidade })] : []).concat([
+          el("td", { class: "dado", text: dataBR(p.data, { day: "2-digit", month: "2-digit" }) }),
+          el("td", null, [el("a", { href: p.url, target: "_blank", rel: "noopener", text: p.tipo + " nº " + p.numero + "/" + p.ano }), el("div", { class: "nota", text: p.ementa.length > 220 ? p.ementa.slice(0, 220) + "…" : p.ementa })]),
+          el("td", { text: (p.autores || []).join(", ") || "—" })
+        ])));
+      });
+      t.appendChild(tb);
+      return el("div", { class: "tabela" }, [t]);
+    };
+    var todos = [];
+    CAP.camaras.forEach(function (c) {
+      c.projetos.forEach(function (p) { todos.push({ cidade: c.cidade + " (" + c.uf + ")", p: p, busca: normaliza([c.cidade, c.uf, p.ementa, (p.autores || []).join(" ")].join(" ")) }); });
+      var outros = Object.keys(c.outros || {}).sort(function (a, b) { return c.outros[b] - c.outros[a]; });
+      var nOutros = outros.reduce(function (t, k) { return t + c.outros[k]; }, 0);
+      var det = el("details", { class: "capital" });
+      det.appendChild(el("summary", null, [el("strong", { text: c.cidade + " (" + c.uf + ")" }), el("span", { class: "nota", text: " · " + c.projetos.length + " projetos de lei · " + c.leis.length + " leis publicadas · " + nOutros + " outras proposições" })]));
+      if (c.projetos.length) det.appendChild(tabelaProjetos(c.projetos, false));
+      else det.appendChild(el("p", { class: "vazio", text: c.aviso ? "Não foi possível consultar esta câmara: " + c.aviso : "Nenhum projeto de lei registrado no sistema da câmara nesta semana." }));
+      if (c.leis.length) {
+        det.appendChild(el("h3", { text: "Leis publicadas" }));
+        det.appendChild(el("ul", { class: "leis-capital" }, c.leis.map(function (l) { return el("li", null, [el("a", { href: l.url, target: "_blank", rel: "noopener", text: l.titulo }), l.ementa ? el("span", { class: "nota", text: " · " + (l.ementa.length > 180 ? l.ementa.slice(0, 180) + "…" : l.ementa) }) : null]); })));
+      }
+      if (nOutros) det.appendChild(el("p", { class: "nota", text: "Outras proposições: " + outros.slice(0, 6).map(function (k) { return k + " " + c.outros[k]; }).join(" · ") + (outros.length > 6 ? " · demais tipos " + outros.slice(6).reduce(function (t, k) { return t + c.outros[k]; }, 0) : "") + "." }));
+      if (c.aviso && c.projetos.length) det.appendChild(el("p", { class: "nota", text: "Aviso: " + c.aviso }));
+      if (c.url) det.appendChild(el("p", { class: "nota" }, ["Fonte: ", el("a", { href: c.url, target: "_blank", rel: "noopener", text: (c.fonte || "sistema") + " da Câmara Municipal de " + c.cidade })]));
+      sc.appendChild(det);
+    });
+    bv.addEventListener("input", function () {
+      var q = normaliza(bv.value.trim());
+      rv.innerHTML = "";
+      if (q.length < 3) return;
+      var achados = todos.filter(function (x) { return x.busca.indexOf(q) >= 0; });
+      rv.appendChild(achados.length ? tabelaProjetos(achados.slice(0, 40), true) : el("p", { class: "vazio", text: "Nenhum projeto encontrado com esse termo nesta semana." }));
+      if (achados.length > 40) rv.appendChild(el("p", { class: "nota", text: "Mostrando 40 de " + achados.length + " projetos. Refine a busca." }));
+    });
+    if (CAP.sem_cobertura && CAP.sem_cobertura.length) {
+      sc.appendChild(el("p", { class: "nota" }, [el("strong", { text: "Sem dados nesta edição: " }), CAP.sem_cobertura.map(function (x) { return x[1] + " (" + x[2] + ")"; }).join("; ") + ". Levantamento das câmaras feito em " + dataBR(CAP.levantamento) + "."]));
+    }
+  }
+
   /* §7 Bahia */
   if ((C.bahia || []).length) { var s7 = secao("bahia", "Bahia e Salvador, em resumo"); s7.appendChild(itens(C.bahia)); }
 
@@ -642,8 +713,33 @@ details.votos[open] > * + * { margin-top: .6rem; }
   rod.appendChild(el("p", { text: "Critérios: Entrega é um fato concreto do mandato (projeto aprovado, relatoria concluída, presença em votação importante). Ponto de atenção é um fato verificável que merece olhar crítico (falta em votação, gasto acima da média, voto contra a orientação do próprio partido, investigação aberta). Registro é um fato sem juízo." }));
   rod.appendChild(el("p", { text: "Os dados vêm de fontes oficiais consultadas na data de publicação. O boletim é informativo, não toma partido e não substitui a leitura das fontes." }));
 
-  /* Sumário */
-  var nav = document.getElementById("sumario");
-  secoes.forEach(function (s) { nav.appendChild(el("a", { href: "#" + s[0], text: s[1] })); });
+  /* Tópicos: botões no início e no fim de cada tópico; o endereço (#id) diz qual tópico está aberto */
+  function botoes(atual) {
+    var g = el("div", { class: "topicos" });
+    secoes.forEach(function (s, i) {
+      var a = el("a", { href: "#" + s[0] }, [el("span", { class: "par", text: "§ " + (i + 1) }), el("span", { text: s[1] })]);
+      if (s[0] === atual) a.setAttribute("aria-current", "page");
+      g.appendChild(a);
+    });
+    return g;
+  }
+  var inicio = document.getElementById("inicio");
+  document.getElementById("sumario").replaceWith(botoes(null));
+  secoes.forEach(function (s) {
+    var sec = document.getElementById(s[0]);
+    sec.insertBefore(el("a", { class: "voltar", href: "#inicio", text: "← Todos os tópicos" }), sec.firstChild);
+    sec.appendChild(el("nav", { class: "topicos-fim", "aria-label": "Outros tópicos" }, [el("span", { class: "rotulo", text: "Outros tópicos" }), botoes(s[0]), el("a", { class: "voltar", href: "#inicio", text: "← Voltar ao início" })]));
+  });
+  var ALIAS = { "governo-justica": "presidente" };
+  function abrirTopico() {
+    var h = location.hash.replace(/^#/, "");
+    h = ALIAS[h] || h;
+    var existe = secoes.some(function (s) { return s[0] === h; });
+    inicio.classList.toggle("inativa", existe);
+    secoes.forEach(function (s) { document.getElementById(s[0]).classList.toggle("inativa", s[0] !== h); });
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", abrirTopico);
+  abrirTopico();
 })();
 </script>

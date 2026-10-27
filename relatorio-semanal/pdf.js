@@ -18,7 +18,10 @@ const IMPRESSAO = `
   .coluna { max-width: none !important; gap: 1.6rem !important; }
   .cabecalho { padding-block: 0 1rem !important; }
   .cabecalho h1 { font-size: 26pt !important; }
-  .sumario { display: none !important; }
+  /* Na página cada tópico abre sozinho; no PDF saem todos, e os botões do fim de cada tópico somem. */
+  section.inativa { display: flex !important; }
+  .topicos-fim, .voltar { display: none !important; }
+  .inicio .intro { display: none !important; }
   section { gap: .8rem !important; break-before: auto; }
   .secao-topo { break-after: avoid; }
   h2, h3 { break-after: avoid; }
@@ -31,6 +34,9 @@ const IMPRESSAO = `
   /* Busca e votos individuais só existem na página online; no PDF ficam o placar e a orientação. */
   #como-votou .intro, #como-votou .busca, #como-votou .resultados, details.votos { display: none !important; }
   .so-impressao { display: block !important; }
+  /* No PDF cada capital fica numa linha de resumo; a lista de projetos e a busca ficam na página. */
+  #capitais .busca, #capitais .resultados { display: none !important; }
+  details.capital { padding: .3rem .6rem !important; break-inside: avoid; }
   .votacao { break-inside: avoid; }
 `;
 

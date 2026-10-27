@@ -3,7 +3,8 @@
 
 Busca indicadores no Banco Central (SGS e Focus), as votações dos plenários
 da Câmara e do Senado na semana (com o voto de cada parlamentar), a agenda da
-Câmara, os vetos em tramitação e os gastos da cota parlamentar (CEAP). Cada fonte é
+Câmara, os vetos em tramitação, os gastos da cota parlamentar (CEAP) e os
+projetos de lei das câmaras das capitais (capitais.py). Cada fonte é
 independente: se uma falhar, o erro vai para "avisos" e as demais seguem.
 O resultado é um JSON que o montar.py junta ao conteúdo redigido.
 
@@ -23,7 +24,10 @@ import urllib.request
 import zipfile
 from collections import Counter, defaultdict
 
+from capitais import coletar_capitais
+
 SGS = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados?formato=json&dataInicial={ini}&dataFinal={fim}"
+SGS_ULTIMOS = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados/ultimos/20?formato=json"
 FOCUS = "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais"
 CAMARA = "https://dadosabertos.camara.leg.br/api/v2"
 # A API /deputados/{id}/despesas vem vazia desde 2025; o arquivo anual é a fonte que funciona.
@@ -88,7 +92,12 @@ def coletar_sgs(hoje):
         ini = hoje - dt.timedelta(days=31 * meses)
         time.sleep(0.5)  # o firewall do BCB recusa rajadas de pedidos
         try:
-            dados = get_json(SGS.format(codigo=codigo, ini=br(ini), fim=br(hoje)))
+            try:
+                dados = get_json(SGS.format(codigo=codigo, ini=br(ini), fim=br(hoje)))
+            except Exception:
+                # O firewall do BCB às vezes devolve uma página de erro; os últimos 20 pontos vêm de outro endereço.
+                time.sleep(5)
+                dados = get_json(SGS_ULTIMOS.format(codigo=codigo))
             pontos = [[iso_de_br(x["data"]), float(x["valor"])] for x in dados if x.get("valor") not in (None, "")]
             if not pontos:
                 raise RuntimeError("série vazia")
@@ -336,13 +345,14 @@ def main():
         "economia": {"series": coletar_sgs(hoje), "focus": coletar_focus(hoje)},
         "camara": coletar_plenario(a.inicio, a.fim, acompanhados),
         "senado": coletar_senado(a.inicio, a.fim),
+        "capitais": coletar_capitais(a.inicio, a.fim, avisos),
         "ceap": coletar_ceap(acompanhados, a.fim),
         "avisos": avisos,
     }
     with open(a.saida, "w", encoding="utf-8") as f:
         json.dump(resultado, f, ensure_ascii=False, indent=1)
     s = resultado["economia"]["series"]
-    print(f"{a.saida}: {len(s)}/{len(SERIES)} séries, {len(resultado['camara']['votacoes'])} votações na Câmara, {len(resultado['senado']['votacoes'])} no Senado, {len(resultado['camara']['agenda'])} eventos na agenda, {len(avisos)} avisos")
+    print(f"{a.saida}: {len(s)}/{len(SERIES)} séries, {len(resultado['camara']['votacoes'])} votações na Câmara, {len(resultado['senado']['votacoes'])} no Senado, {sum(len(c['projetos']) for c in resultado['capitais']['camaras'])} projetos nas capitais, {len(resultado['camara']['agenda'])} eventos na agenda, {len(avisos)} avisos")
     for av in avisos:
         print("  aviso:", av, file=sys.stderr)
 

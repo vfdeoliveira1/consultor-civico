@@ -75,6 +75,7 @@ Não faça commit nem push dos boletins nem dos PDFs no repositório.
 | **Em evidência** (`em_evidencia`) | Os 3 a 5 deputados mais comentados, com o critério usado. A tabela de cota parlamentar vem do `coleta.py`. | Busca na web, API da Câmara, `coleta.py`. |
 | **Presidente e governo federal** (`presidente`) | O que o Presidente da República fez na semana, em grupos: `sancoes` (leis sancionadas), `vetos` (vetos novos, totais ou parciais), `mps` (medidas provisórias editadas ou que perderam validade), `decretos` (decretos e outros atos relevantes) e `agenda` (agenda oficial, viagens, anúncios de programas, transição até as posses de 2027). A tabela de vetos à espera do Congresso vem do `coleta.py`. | Diário Oficial, agenda do Presidente em `www.gov.br/planalto`, MCP `senado-br` (vetos), busca na web, Portal da Transparência (com a chave `PORTAL_TRANSPARENCIA_API_KEY`, quando houver). |
 | **Justiça** (`justica`) | Julgamentos do STF e do STJ com efeito geral: repercussão geral, ações de controle de constitucionalidade, súmulas novas. | `portal.stf.jus.br`, pasta `jurisprudencia/` do acervo, busca na web. DataJud só para processos específicos. |
+| **Câmaras das capitais** | Seção automática: projetos de lei e leis publicadas na semana nas câmaras das capitais com dados abertos (lista em `capitais.py`), com busca por vereador. Não precisa de conteúdo. Se uma câmara do levantamento passar a responder, ou deixar de responder, atualize `CAPITAIS_SAPL` e `SEM_COBERTURA` em `capitais.py`. | `coleta.py` e `capitais.py`. |
 | **Bahia e Salvador** (`bahia`) | No máximo 3 itens: o que tiver efeito sobre o leitor ou ligação com o governo federal. | Busca na web, Querido Diário (`api.queridodiario.ok.org.br`). |
 | **Agenda** (`agenda`) | A pauta do plenário da Câmara vem do `coleta.py` e entra sozinha: não a repita no `conteudo.json`. Acrescente Senado, Copom, divulgações do IBGE, julgamentos marcados no STF e prazos de MPs. | MCP `senado-br`, calendários do Banco Central e do IBGE, pauta do STF. |
 | **Para entender** (`tema_da_semana`) | 3 a 5 parágrafos didáticos sobre o assunto mais discutido: o que é, o que diz a lei (com artigo e arquivo do acervo), quais são os argumentos. | Acervo local e as fontes da semana. |
@@ -98,7 +99,7 @@ Não faça commit nem push dos boletins nem dos PDFs no repositório.
 
 `conteudo.json` segue `exemplo.json`. Campos:
 
-- `destaques`: lista de `{texto, link}`. `link` é o id da seção (`economia`, `congresso`, `como-votou`, `deputados`, `evidencia`, `presidente`, `justica`, `bahia`, `agenda`, `tema`).
+- `destaques`: lista de `{texto, link}`. `link` é o id da seção (`economia`, `congresso`, `como-votou`, `deputados`, `evidencia`, `presidente`, `justica`, `capitais`, `bahia`, `agenda`, `tema`).
 - `economia`: `{intro, analise, fatos: [item]}`. `analise` aceita parágrafos separados por linha em branco.
 - `presidente`: `{intro, sancoes, vetos, mps, decretos, agenda}`, cada grupo uma lista de **item**. O campo antigo `executivo` ainda funciona e aparece como "Outros atos do governo".
 - `leis`, `justica`, `bahia`, `congresso.itens`, `em_evidencia.deputados`: listas de **item**.
