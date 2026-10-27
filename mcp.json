@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "senado-br": {
+      "type": "http",
+      "url": "https://senado.sidneybissoli.com/mcp"
+    },
+    "bcb-br": {
+      "command": "npx",
+      "args": ["-y", "bcb-br-mcp"]
+    }
+  }
+}
