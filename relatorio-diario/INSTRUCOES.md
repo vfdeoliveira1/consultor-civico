@@ -35,7 +35,13 @@ Para mudar o boletim diário, edite este arquivo. A tarefa agendada só manda le
    ```
 6. **Confira uma vez** com o Playwright pré-instalado: abra o HTML, veja se não há erro no console e se as notícias aparecem. Não altere o `modelo.html` na sessão diária. Se algo estiver quebrado, conserte o `conteudo.json`.
 7. **Publique na página fixa.** Carregue o skill `artifact-design` (a ferramenta exige). Leia a página com a ferramenta Artifact (`action: "read"`, `url` acima) e publique `/tmp/diario/boletim-diario.html` com o mesmo `url`. Não passe `icon`. Use `label` com a data coberta, por exemplo "29/10/2026". Não crie página nova.
-8. **Responda** em até 4 linhas, porque essa mensagem vira a notificação no celular do leitor: a data coberta, o link da página e os títulos das 3 primeiras notícias, encurtados.
+8. **Gere o PDF** do mesmo HTML, com as explicações abertas, usando o gerador do semanal:
+   ```bash
+   node ../relatorio-semanal/pdf.js /tmp/diario/boletim-diario.html /tmp/diario/boletim-diario-AAAA-MM-DD.pdf
+   ```
+   Use a data coberta no nome do arquivo. Se o script sair com erro, conserte o `conteudo.json` e gere de novo.
+9. **Envie o PDF** ao leitor com a ferramenta `SendUserFile` (`status: "proactive"`, `display: "attach"`), com a legenda "Boletim Cívico diário, DD/MM". Se a ferramenta não estiver disponível, diga isso na resposta final.
+10. **Responda** em até 4 linhas, porque essa mensagem vira a notificação no celular do leitor: a data coberta, o link da página, se o PDF foi enviado e os títulos das 3 primeiras notícias, encurtados.
 
 Não faça commit nem push de nada na sessão diária.
 

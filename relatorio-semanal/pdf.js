@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Gera o PDF do boletim a partir do HTML montado pelo montar.py (ou baixado da página publicada).
+// Gera o PDF do boletim (semanal ou diário) a partir do HTML montado pelo montar.py (ou baixado da página publicada).
 //
 // Uso:
 //   node pdf.js boletim.html boletim.pdf
@@ -62,6 +62,8 @@ async function main() {
   await page.goto("file://" + tmp, { waitUntil: "networkidle", timeout: 60000 }).catch(() => {});
   await page.evaluate(() => document.fonts && document.fonts.ready);
   await page.addStyleTag({ content: `@media print { ${IMPRESSAO} }` });
+  // No boletim diário, as explicações das notícias ficam recolhidas na página; no PDF saem abertas.
+  await page.evaluate(() => document.querySelectorAll("details.entenda").forEach((d) => { d.open = true; }));
   const secoes = await page.evaluate(() => document.querySelectorAll("section").length);
   const titulo = await page.title();
   await page.pdf({

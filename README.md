@@ -108,6 +108,8 @@ Cada edição traz:
 - **Votações de ontem** nos plenários da Câmara e do Senado, com o resultado.
 - **Hoje:** a pauta do plenário da Câmara e o que mais estiver marcado.
 
+A sessão também gera um PDF da edição, com todas as explicações abertas, e o envia ao leitor.
+
 O passo a passo e os critérios de escolha das notícias estão em [`relatorio-diario/INSTRUCOES.md`](relatorio-diario/INSTRUCOES.md).
 
 | Arquivo | Para que serve |

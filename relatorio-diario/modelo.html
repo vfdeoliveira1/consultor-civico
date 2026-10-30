@@ -114,7 +114,19 @@ details.entenda[open] > summary { border-bottom: 1px solid var(--linha); }
 
 .rodape { font-size: .85rem; color: var(--tinta-2); border-top: 1px solid var(--linha); padding-top: 1rem; display: flex; flex-direction: column; gap: .5rem; }
 .rodape ul { margin: 0; padding-left: 1.1rem; }
-@media (prefers-reduced-motion: no-preference) { details.entenda[open] .explicacao { animation: abre .18s ease-out; } }
+/* PDF (pdf.js abre todas as explicações antes de imprimir) */
+@media print {
+  .noticia { break-inside: auto; }
+  .noticia h3, .noticia .meta { break-after: avoid; }
+  details.entenda > summary { color: var(--tinta-2); cursor: default; }
+  details.entenda > summary::before, details.entenda[open] > summary::before { content: none; }
+  .explicacao h4 { break-after: avoid; }
+  .lados > div, .lista-simples li, .ind { break-inside: avoid; }
+  .secao-topo { break-after: avoid; }
+  /* O pdf.js do semanal força 3 colunas nos indicadores; aqui são 4. */
+  .coluna > .indicadores { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+}
+@media screen and (prefers-reduced-motion: no-preference) { details.entenda[open] .explicacao { animation: abre .18s ease-out; } }
 @keyframes abre { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
 </style>
 
