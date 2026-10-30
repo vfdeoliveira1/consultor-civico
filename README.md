@@ -100,7 +100,7 @@ Quando uma câmara passar a responder, acrescente-a em `CAPITAIS_SAPL` e libere 
 
 ## Boletim Cívico diário
 
-A versão curta do boletim, para ler em poucos minutos. Cobre o dia anterior e é republicada todo dia na mesma página: https://claude.ai/artifact/LpjDfH8eiBUkSXKt2RSwpH. As edições antigas ficam no histórico de versões dela.
+A versão curta do boletim, para ler em poucos minutos. Uma tarefa agendada no claude.ai roda **todo dia às 6h47** (horário de Brasília). Cada edição cobre o dia anterior e é republicada na mesma página: https://claude.ai/artifact/LpjDfH8eiBUkSXKt2RSwpH. As edições antigas ficam no histórico de versões dela.
 
 Cada edição traz:
 - **Indicadores do dia:** meta Selic, dólar com a variação no dia, IPCA em 12 meses e a expectativa de inflação do Focus.
