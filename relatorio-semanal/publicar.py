@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publica uma edição no site do boletim (branch `site`, servido pelo Cloudflare Pages atrás do login).
+"""Publica uma edição no site do boletim (branch `site`, servido por um Worker da Cloudflare atrás do login).
 
 Monta o boletim com o endereço do arquivo do próprio site, copia os PDFs, atualiza a lista de
 edições e a página inicial, grava a política de segurança de cada página e faz commit e push.

@@ -1,0 +1,297 @@
+<title>{{TITULO}}</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..650;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a mesma identidade do boletim semanal, em formato de folha do dia: faixa de indicadores, notícias numeradas
+   por importância, cada uma com a explicação recolhida, e no fim o Congresso de ontem e a pauta de hoje. */
+:root {
+  --papel: #f5f6f3;
+  --folha: #ffffff;
+  --tinta: #17211f;
+  --tinta-2: #4b5855;
+  --linha: #d9dedb;
+  --acento: #0e6655;
+  --acento-suave: #e1efeb;
+  --ocre: #9a6412;
+  --bom: #1f7a3d;
+  --atencao: #a3461c;
+  --f-titulo: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-texto: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-dado: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --raio: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papel: #0f1514; --folha: #161e1c; --tinta: #e4ebe8; --tinta-2: #9fb0ab; --linha: #2a3532;
+    --acento: #5cc7ad; --acento-suave: #1b2f2a; --ocre: #e0a54a; --bom: #6fcf8e; --atencao: #f08a5d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --papel: #0f1514; --folha: #161e1c; --tinta: #e4ebe8; --tinta-2: #9fb0ab; --linha: #2a3532;
+  --acento: #5cc7ad; --acento-suave: #1b2f2a; --ocre: #e0a54a; --bom: #6fcf8e; --atencao: #f08a5d;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--papel); color: var(--tinta);
+  font-family: var(--f-texto); font-size: 1.05rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+.coluna { max-width: 44rem; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 2.4rem; }
+.coluna > *, section > * { min-width: 0; }
+a { color: var(--acento); text-underline-offset: 2px; }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-titulo); text-wrap: balance; margin: 0; line-height: 1.15; }
+p { margin: 0; }
+.dado { font-family: var(--f-dado); font-variant-numeric: tabular-nums; }
+.rotulo { font-family: var(--f-titulo); font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-2); }
+
+/* Cabeçalho */
+.cabecalho { padding-block: 2.2rem 1.2rem; border-bottom: 3px double var(--tinta); display: flex; flex-direction: column; gap: .5rem; }
+.cabecalho h1 { font-size: clamp(2rem, 6.5vw, 3rem); font-weight: 800; font-stretch: 80%; letter-spacing: -.01em; }
+.linha-edicao { display: flex; flex-wrap: wrap; gap: .25rem 1.2rem; color: var(--tinta-2); font-size: .92rem; }
+.frase { font-size: 1.15rem; line-height: 1.5; max-width: 62ch; }
+
+/* Indicadores: uma faixa só, sem gráfico; o semanal tem as séries completas. */
+.indicadores { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-block: 1px solid var(--linha); }
+.ind { padding: .7rem .8rem; display: flex; flex-direction: column; gap: .1rem; border-left: 1px solid var(--linha); }
+.ind:first-child { border-left: 0; padding-left: 0; }
+.ind .valor { font-family: var(--f-dado); font-size: 1.25rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.ind .detalhe { font-size: .78rem; color: var(--tinta-2); line-height: 1.35; }
+.sobe { color: var(--atencao); } .desce { color: var(--bom); }
+@media (max-width: 560px) {
+  .indicadores { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ind:nth-child(3) { border-left: 0; padding-left: 0; }
+  .ind:nth-child(n+3) { border-top: 1px solid var(--linha); }
+}
+
+/* Seções */
+section { display: flex; flex-direction: column; gap: 1rem; }
+.secao-topo { display: flex; align-items: baseline; gap: .7rem; border-bottom: 1px solid var(--tinta); padding-bottom: .4rem; }
+.secao-topo h2 { font-size: 1.45rem; font-weight: 750; font-stretch: 85%; }
+.vazio { color: var(--tinta-2); font-style: italic; }
+
+/* Notícias: numeradas porque a ordem é a de importância. */
+.noticias { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.6rem; counter-reset: n; }
+.noticia { counter-increment: n; display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: .2rem .6rem; }
+.noticia::before { content: counter(n); font-family: var(--f-titulo); font-weight: 800; font-stretch: 75%; font-size: 1.9rem; line-height: 1; color: var(--acento); grid-column: 1; grid-row: 1 / span 2; }
+.noticia > * { grid-column: 2; }
+.noticia .meta { display: flex; flex-wrap: wrap; gap: .3rem .5rem; align-items: center; }
+.chip { font-family: var(--f-titulo); font-size: .68rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: .08rem .45rem; border-radius: 3px; border: 1px solid var(--linha); color: var(--tinta-2); }
+.chip.tema { border-color: var(--ocre); color: var(--ocre); }
+.noticia h3 { font-size: 1.22rem; font-weight: 700; font-stretch: 90%; }
+.noticia .resumo { max-width: 64ch; }
+.fontes { font-size: .82rem; color: var(--tinta-2); display: flex; flex-wrap: wrap; gap: .1rem .6rem; overflow-wrap: anywhere; }
+
+/* Explicação recolhida */
+details.entenda { border: 1px solid var(--linha); border-radius: var(--raio); background: var(--folha); margin-top: .35rem; }
+details.entenda > summary { cursor: pointer; list-style: none; padding: .55rem .8rem; font-family: var(--f-titulo); font-weight: 650; font-size: .92rem; color: var(--acento); display: flex; align-items: center; gap: .5rem; }
+details.entenda > summary::-webkit-details-marker { display: none; }
+details.entenda > summary::before { content: "+"; font-family: var(--f-dado); font-weight: 500; width: 1rem; text-align: center; }
+details.entenda[open] > summary::before { content: "−"; }
+details.entenda[open] > summary { border-bottom: 1px solid var(--linha); }
+.explicacao { padding: .8rem .9rem 1rem; display: flex; flex-direction: column; gap: .8rem; font-size: .98rem; }
+.explicacao h4 { margin: 0 0 .15rem; font-family: var(--f-titulo); font-size: .74rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--tinta-2); }
+.lados { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
+.lados > div { background: var(--acento-suave); border-radius: var(--raio); padding: .6rem .7rem; }
+.lados strong { display: block; font-family: var(--f-titulo); font-size: .85rem; margin-bottom: .15rem; }
+@media (max-width: 560px) { .lados { grid-template-columns: minmax(0, 1fr); } }
+
+/* Congresso e pauta */
+.lista-simples { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.lista-simples li { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: .2rem .8rem; padding: .55rem 0; border-top: 1px solid var(--linha); font-size: .95rem; }
+.lista-simples li:first-child { border-top: 0; }
+.lista-simples .esq { font-family: var(--f-dado); font-size: .82rem; color: var(--tinta-2); padding-top: .15rem; }
+.res { font-family: var(--f-titulo); font-weight: 700; font-size: .8rem; }
+.res.ok { color: var(--bom); } .res.nao { color: var(--atencao); }
+.ementa { color: var(--tinta-2); font-size: .88rem; }
+@media (max-width: 420px) { .lista-simples li { grid-template-columns: minmax(0, 1fr); } }
+
+.rodape { font-size: .85rem; color: var(--tinta-2); border-top: 1px solid var(--linha); padding-top: 1rem; display: flex; flex-direction: column; gap: .5rem; }
+.rodape ul { margin: 0; padding-left: 1.1rem; }
+@media (prefers-reduced-motion: no-preference) { details.entenda[open] .explicacao { animation: abre .18s ease-out; } }
+@keyframes abre { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+</style>
+
+<div class="coluna">
+  <header class="cabecalho">
+    <span class="rotulo">Boletim Cívico · diário</span>
+    <h1 id="titulo">O dia em Brasília</h1>
+    <p class="frase" id="frase" hidden></p>
+    <div class="linha-edicao" id="edicao"></div>
+  </header>
+  <div class="indicadores" id="indicadores"></div>
+  <section id="noticias">
+    <div class="secao-topo"><h2>As notícias de ontem</h2></div>
+    <ol class="noticias" id="lista-noticias"></ol>
+  </section>
+  <section id="congresso">
+    <div class="secao-topo"><h2>Votações de ontem no Congresso</h2></div>
+  </section>
+  <section id="hoje">
+    <div class="secao-topo"><h2>Hoje</h2></div>
+  </section>
+  <footer class="rodape" id="rodape"></footer>
+</div>
+
+<script id="dados" type="application/json">{{DADOS}}</script>
+<script>
+(function () {
+  "use strict";
+  var D = JSON.parse(document.getElementById("dados").textContent);
+  var C = D.conteudo || {}, K = D.coletados || {};
+  var S = (K.economia || {}).series || {}, F = (K.economia || {}).focus;
+
+  function el(tag, attrs, filhos) {
+    var n = document.createElement(tag);
+    if (attrs) for (var k in attrs) {
+      if (attrs[k] == null) continue;
+      if (k === "class") n.className = attrs[k];
+      else if (k === "text") n.textContent = attrs[k];
+      else n.setAttribute(k, attrs[k]);
+    }
+    (filhos || []).forEach(function (f) { if (f != null) n.appendChild(typeof f === "string" ? document.createTextNode(f) : f); });
+    return n;
+  }
+  function nf(v, casas) { return v == null || isNaN(v) ? "—" : Number(v).toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas }); }
+  function dataBR(iso, opts) {
+    if (!iso) return "";
+    return new Date(iso.length <= 10 ? iso + "T12:00:00" : iso).toLocaleDateString("pt-BR", opts || { day: "2-digit", month: "2-digit", year: "numeric" });
+  }
+  function fontes(lista) {
+    if (!lista || !lista.length) return null;
+    return el("div", { class: "fontes" }, lista.map(function (f) {
+      return f.url ? el("a", { href: f.url, target: "_blank", rel: "noopener", text: f.nome || f.url }) : el("span", { text: f.nome });
+    }));
+  }
+  function secao(id) { return document.getElementById(id); }
+
+  /* Cabeçalho */
+  var dia = K.dia || C.dia;
+  var titulo = dataBR(dia, { weekday: "long", day: "numeric", month: "long" });
+  document.getElementById("titulo").textContent = titulo.charAt(0).toUpperCase() + titulo.slice(1);
+  if (C.frase) { var fr = document.getElementById("frase"); fr.textContent = C.frase; fr.hidden = false; }
+  var ed = document.getElementById("edicao");
+  ed.appendChild(el("span", { text: "O que aconteceu ontem, para ler em poucos minutos" }));
+  ed.appendChild(el("span", { class: "dado", text: "Publicado em " + dataBR(D.gerado_em, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) }));
+  if (D.arquivo_url) ed.appendChild(el("a", { href: D.arquivo_url, target: /^https?:/.test(D.arquivo_url) ? "_blank" : null, rel: "noopener", text: "Boletins semanais →" }));
+
+  /* Indicadores */
+  var ind = document.getElementById("indicadores");
+  function ultimo(serie) { var p = (S[serie] || {}).pontos || []; return p.length ? p[p.length - 1] : null; }
+  function penultimo(serie) { var p = (S[serie] || {}).pontos || []; return p.length > 1 ? p[p.length - 2] : null; }
+  function tile(rotulo, valor, detalhe, classe) {
+    ind.appendChild(el("div", { class: "ind" }, [el("span", { class: "rotulo", text: rotulo }), el("span", { class: "valor", text: valor }), detalhe ? el("span", { class: "detalhe " + (classe || ""), text: detalhe }) : null]));
+  }
+  var sel = ultimo("selic_meta");
+  tile("Meta Selic", sel ? nf(sel[1], 2) + "%" : "—", sel ? "ao ano, em " + dataBR(sel[0], { day: "2-digit", month: "2-digit" }) : "sem dado");
+  var dol = ultimo("dolar"), dol0 = penultimo("dolar");
+  var vari = dol && dol0 ? (Math.round(dol[1] * 10000) / Math.round(dol0[1] * 10000) - 1) * 100 : null;
+  tile("Dólar", dol ? "R$ " + nf(dol[1], 4) : "—",
+    dol ? dataBR(dol[0], { day: "2-digit", month: "2-digit" }) + (vari != null ? " · " + (vari > 0 ? "+" : "") + nf(vari, 2) + "% no dia" : "") : "sem dado",
+    vari > 0 ? "sobe" : vari < 0 ? "desce" : null);
+  var ipca = ultimo("ipca_12m");
+  tile("IPCA em 12 meses", ipca ? nf(ipca[1], 2) + "%" : "—", ipca ? "até " + dataBR(ipca[0], { month: "long", year: "numeric" }) : "sem dado");
+  var ano = F && F.anos ? F.anos[0] : null, fi = F && F.medianas && F.medianas.IPCA ? F.medianas.IPCA[ano] : null;
+  tile("IPCA esperado " + (ano || ""), fi != null ? nf(fi, 2) + "%" : "—", F ? "Focus de " + dataBR(F.data, { day: "2-digit", month: "2-digit" }) : "sem dado");
+
+  /* Temas do leitor: quem escreve a edição marca cada notícia com os nomes de temas.json;
+     palavras-chave soltas marcariam errado (uma notícia que cita a "Polícia Federal" não é de segurança pública). */
+  var nomesTemas = (D.temas || []).map(function (t) { return t.nome; });
+
+  /* Notícias */
+  var lista = document.getElementById("lista-noticias");
+  var NOTICIAS = C.noticias || [];
+  if (!NOTICIAS.length) secao("noticias").appendChild(el("p", { class: "vazio", text: "Sem notícias nesta edição." }));
+  NOTICIAS.forEach(function (n, i) {
+    var x = n.explicacao || {};
+    var temas = (n.temas || []).filter(function (t) { return nomesTemas.indexOf(t) >= 0; });
+    var meta = el("div", { class: "meta" }, [n.assunto ? el("span", { class: "chip", text: n.assunto }) : null].concat(temas.map(function (t) { return el("span", { class: "chip tema", title: "Tema que você acompanha", text: "Seu tema: " + t }); })));
+    var blocos = [];
+    function bloco(rot, txt) { if (txt) blocos.push(el("div", null, [el("h4", { text: rot }), el("p", { text: txt })])); }
+    bloco("O contexto", x.contexto);
+    bloco("Por que importa", x.por_que_importa);
+    if (x.lei) blocos.push(el("div", null, [el("h4", { text: "O que diz a lei" }), el("p", { text: x.lei })]));
+    if (x.lados && (x.lados.a || x.lados.b)) {
+      blocos.push(el("div", null, [el("h4", { text: "Como cada lado vê" }), el("div", { class: "lados" }, [
+        el("div", null, [el("strong", { text: x.lados.rotulo_a || "A favor" }), el("p", { text: x.lados.a || "—" })]),
+        el("div", null, [el("strong", { text: x.lados.rotulo_b || "Contra" }), el("p", { text: x.lados.b || "—" })])
+      ])]));
+    }
+    bloco("O que vem agora", x.o_que_vem);
+    if (x.fontes && x.fontes.length) blocos.push(fontes(x.fontes));
+    var det = blocos.length ? el("details", { class: "entenda", id: "entenda-" + (i + 1) }, [el("summary", { text: "Entenda o que está em jogo" }), el("div", { class: "explicacao" }, blocos)]) : null;
+    lista.appendChild(el("li", { class: "noticia" }, [meta, el("h3", { text: n.titulo }), n.resumo ? el("p", { class: "resumo", text: n.resumo }) : null, fontes(n.fontes), det]));
+  });
+
+  /* Congresso de ontem */
+  var sc = secao("congresso");
+  var porProp = {}, ordem = [];
+  ((K.camara || {}).votacoes || []).forEach(function (v) {
+    var s = v.proposicao.sigla;
+    if (!porProp[s]) { porProp[s] = { prop: v.proposicao, passos: [] }; ordem.push(s); }
+    porProp[s].passos.push(v);
+  });
+  var votSen = (K.senado || {}).votacoes || [];
+  if (!ordem.length && !votSen.length) sc.appendChild(el("p", { class: "vazio", text: "Os plenários da Câmara e do Senado não registraram votações ontem." }));
+  function linhaRes(aprov, texto) { return el("span", { class: "res " + (aprov === 1 ? "ok" : aprov === 0 ? "nao" : ""), text: texto }); }
+  if (ordem.length) {
+    sc.appendChild(el("h3", { class: "rotulo", text: "Câmara dos Deputados" }));
+    var ul = el("ul", { class: "lista-simples" });
+    ordem.forEach(function (s) {
+      var g = porProp[s];
+      var passos = g.passos.map(function (v) {
+        var curta = (v.descricao || "").replace(/\s+/g, " ");
+        if (curta.length > 140) curta = curta.slice(0, 137) + "…";
+        var pl = v.placar ? " " + v.placar.sim + " a " + v.placar.nao : "";
+        return el("div", null, [linhaRes(v.aprovacao, v.aprovacao === 1 ? "Aprovado" + pl : v.aprovacao === 0 ? "Rejeitado" + pl : "Votado" + pl), " · " + curta]);
+      });
+      ul.appendChild(el("li", null, [
+        el("span", { class: "esq", text: s }),
+        el("div", null, [el("a", { href: g.prop.url, target: "_blank", rel: "noopener", text: "Ver a proposta" }), g.prop.ementa ? el("p", { class: "ementa", text: g.prop.ementa }) : null].concat(passos))
+      ]));
+    });
+    sc.appendChild(ul);
+  }
+  if (votSen.length) {
+    sc.appendChild(el("h3", { class: "rotulo", text: "Senado Federal" }));
+    var us = el("ul", { class: "lista-simples" });
+    votSen.forEach(function (v) {
+      var p = v.placar || {};
+      var ok = /aprovad/i.test(v.resultado || "") ? 1 : /rejeitad/i.test(v.resultado || "") ? 0 : null;
+      us.appendChild(el("li", null, [
+        el("span", { class: "esq", text: v.materia || "" }),
+        el("div", null, [linhaRes(ok, (v.resultado || "Votada") + (p.sim != null ? " · " + p.sim + " a " + p.nao : "") + (v.secreta ? " · votação secreta" : "")),
+          v.ementa ? el("p", { class: "ementa", text: v.ementa }) : null,
+          v.url ? el("a", { href: v.url, target: "_blank", rel: "noopener", text: "Ver a matéria" }) : null])
+      ]));
+    });
+    sc.appendChild(us);
+  }
+  sc.appendChild(el("p", { class: "ementa", text: "Só votações em plenário. O voto de cada parlamentar fica no boletim semanal." }));
+
+  /* Hoje */
+  var sh = secao("hoje");
+  var itens = [];
+  (C.agenda_hoje || []).forEach(function (a) { itens.push({ hora: a.hora || "", texto: a.evento, onde: a.onde }); });
+  ((K.camara || {}).agenda || []).forEach(function (e) { itens.push({ hora: (e.inicio || "").slice(11, 16), texto: "Plenário da Câmara: " + (e.tipo || "sessão") + (e.descricao ? " — " + e.descricao : ""), onde: e.situacao }); });
+  itens.sort(function (a, b) { return (a.hora || "99") < (b.hora || "99") ? -1 : 1; });
+  if (!itens.length) sh.appendChild(el("p", { class: "vazio", text: "Nada marcado nas fontes consultadas para hoje." }));
+  else {
+    var uh = el("ul", { class: "lista-simples" });
+    itens.forEach(function (a) { uh.appendChild(el("li", null, [el("span", { class: "esq", text: a.hora || "sem horário" }), el("div", null, [el("span", { text: a.texto }), a.onde ? el("p", { class: "ementa", text: a.onde }) : null])])); });
+    sh.appendChild(uh);
+  }
+
+  /* Rodapé */
+  var rod = document.getElementById("rodape");
+  var avisos = (K.avisos || []).concat(C.avisos || []);
+  if (avisos.length) rod.appendChild(el("div", null, [el("strong", { text: "O que não foi possível consultar" }), el("ul", null, avisos.map(function (a) { return el("li", { text: a }); }))]));
+  rod.appendChild(el("p", { text: "Indicadores: Banco Central (séries do SGS e boletim Focus). Votações e pauta: dados abertos da Câmara e do Senado. Notícias: veículos citados em cada uma. As explicações separam o que é fato do que é opinião de cada lado e não substituem a leitura das fontes." }));
+})();
+</script>

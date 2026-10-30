@@ -1,0 +1,186 @@
+{
+ "_como_usar": "Formato do conteudo.json do boletim diário. Os textos abaixo são da edição de 29/10/2026, usada para testar o formato; cada edição nova tem as próprias notícias e fontes.",
+ "frase": "Um dia depois de chegar aos Estados Unidos, Flávio Bolsonaro viu o próprio partido criticar sua carta, enquanto a Justiça do Trabalho agiu contra posts que pregam demissão por voto e o mercado esperava sinais da nova equipe econômica.",
+ "noticias": [
+  {
+   "assunto": "Política",
+   "titulo": "Casa Branca ajudou na saída de Flávio Bolsonaro, diz jornal americano; senador prepara pedido de asilo",
+   "resumo": "Segundo o The New York Times, um assessor da Casa Branca providenciou o jato que levou o senador aos EUA, e Trump autorizou a entrada temporária dele e da família. A Polícia Federal diz não ter registro oficial da saída e investiga a viagem.",
+   "fontes": [
+    {
+     "nome": "Poder360, 29/10",
+     "url": "https://www.poder360.com.br/poder-internacional/assessor-de-trump-ajudou-flavio-a-fugir-do-brasil-e-entrar-nos-eua/"
+    },
+    {
+     "nome": "Gazeta do Povo, 29/10",
+     "url": "https://www.gazetadopovo.com.br/republica/flavio-bolsonaro-articula-pedido-de-asilo-politico-nos-estados-unidos/"
+    }
+   ],
+   "explicacao": {
+    "contexto": "Na noite da eleição, 25/10, a PF pediu a apreensão dos passaportes de Flávio, 7 minutos depois de o TSE confirmar a reeleição de Lula. O ministro Alexandre de Moraes, do STF, aceitou o pedido e proibiu o senador de sair do país, numa investigação que envolve o advogado Willer Tomaz. Flávio não entregou os passaportes e, na noite de 27/10, cruzou a fronteira com a Argentina e seguiu de avião, passando pelo Equador, até Miami.",
+    "por_que_importa": "Um senador investigado deixou o país contra uma ordem judicial, com ajuda atribuída ao governo de outro país. O caso testa a relação entre Brasil e Estados Unidos logo no início do quarto mandato de Lula e define quem lidera a oposição.",
+    "lados": {
+     "rotulo_a": "Quem apoia Flávio",
+     "a": "Diz que ele é vítima de perseguição política: a rapidez das decisões contra ele mostraria uso do Judiciário para calar a oposição. É o argumento que os advogados pretendem levar ao pedido de asilo.",
+     "rotulo_b": "Quem critica a saída",
+     "b": "Diz que ele descumpriu uma ordem judicial para fugir de uma investigação criminal comum, e que a decisão de Moraes seguiu um pedido da PF dentro de um inquérito em andamento."
+    },
+    "o_que_vem": "A PF apura as circunstâncias da viagem e o possível descumprimento da decisão judicial. Nos EUA, o pedido de asilo depende de convencer as autoridades de que há perseguição, e não uma investigação comum.",
+    "fontes": [
+     {
+      "nome": "Poder360: cronologia do caso",
+      "url": "https://www.poder360.com.br/poder-justica/leia-a-cronologia-dos-fatos-que-levaram-flavio-bolsonaro-deixar-o-brasil/"
+     }
+    ]
+   }
+  },
+  {
+   "assunto": "Congresso",
+   "titulo": "Presidente do PL diz que \"não gostou\" da carta de Flávio, que pode perder o mandato por faltas",
+   "resumo": "Valdemar Costa Neto criticou a carta em que o senador se dizia \"verdadeiro presidente eleito\", expressão depois trocada por \"líder do Brasil\". Flávio soma 11 faltas sem justificativa no Senado em 2026.",
+   "fontes": [
+    {
+     "nome": "Poder360, 29/10",
+     "url": "https://www.poder360.com.br/poder-eleicoes-2026/nao-gostei-diz-valdemar-sobre-carta-de-flavio/"
+    },
+    {
+     "nome": "Poder360, 29/10",
+     "url": "https://www.poder360.com.br/poder-congresso/flavio-pode-atingir-maximo-de-faltas-no-senado-e-perder-mandato/"
+    },
+    {
+     "nome": "Agência Brasil, 28/10",
+     "url": "https://agenciabrasil.ebc.com.br/politica/noticia/2026-10/em-carta-golpista-flavio-agradece-milei-e-trump-por-apoio-para-fuga"
+    }
+   ],
+   "explicacao": {
+    "contexto": "A carta, divulgada em 28/10 depois da chegada aos EUA, agradece a Trump e a Milei, põe em dúvida a virada de Lula e diz que o senador vai liderar a oposição de fora do país. Teve três versões. A crítica de Valdemar, presidente do partido de Flávio, mostra a divisão da direita sobre o que fazer agora.",
+    "por_que_importa": "Fora do país, Flávio continua senador. Se acumular faltas, pode perder o cargo sem votação em plenário.",
+    "lei": "A Constituição tira o mandato do parlamentar que faltar a um terço das sessões ordinárias do ano, salvo licença ou missão autorizada (CF, art. 55, III). Nesse caso a perda é declarada pela Mesa do Senado, com direito de defesa (art. 55, §3º). Já a cassação por quebra de decoro exige maioria absoluta, 41 dos 81 senadores (art. 55, II e §2º). Pelo levantamento do Poder360, se o Senado chegar a 72 sessões no ano, o limite é de 24 faltas.",
+    "lados": {
+     "rotulo_a": "Na carta, Flávio",
+     "a": "Afirma que saiu de um \"regime de exceção\", que é alvo de uma \"caça às bruxas politicamente motivada\" e que vai dizer de fora o que os aliados no Brasil não podem dizer.",
+     "rotulo_b": "Críticos da carta",
+     "b": "A veem como ataque ao resultado da eleição. A deputada Sâmia Bonfim (Psol-SP) anunciou que pedirá à Mesa do Senado a perda do mandato e a suspensão do salário por abandono do cargo."
+    },
+    "o_que_vem": "As faltas seguem contando até o recesso, que começa em 23/12. A Mesa do Senado pode ser provocada por um senador ou partido; um processo por quebra de decoro iria ao Conselho de Ética.",
+    "fontes": [
+     {
+      "nome": "Constituição Federal, art. 55",
+      "url": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm"
+     }
+    ]
+   }
+  },
+  {
+   "assunto": "Justiça",
+   "titulo": "Justiça do Trabalho manda Meta apagar posts que incentivam demitir funcionários por causa do voto",
+   "temas": [
+    "Trabalho, emprego e previdência"
+   ],
+   "resumo": "A decisão provisória obriga a remoção de 14 publicações em 24 horas e um aviso contra assédio eleitoral para todos os usuários no Brasil. No mesmo dia, deputados do PT apresentaram projeto que torna crime a discriminação política no trabalho.",
+   "fontes": [
+    {
+     "nome": "Poder360, 30/10",
+     "url": "https://www.poder360.com.br/poder-justica/justica-manda-meta-tirar-do-ar-posts-que-incentivam-demissao-por-voto/"
+    },
+    {
+     "nome": "Gazeta do Povo, 29/10",
+     "url": "https://www.gazetadopovo.com.br/republica/justica-obriga-meta-a-excluir-posts-que-estimulam-demissao-por-divergencia-politica/"
+    },
+    {
+     "nome": "Poder360, 29/10",
+     "url": "https://www.poder360.com.br/poder-congresso/pt-propoe-prisao-de-ate-6-anos-por-discriminacao-politica-no-trabalho/"
+    }
+   ],
+   "explicacao": {
+    "contexto": "Depois do segundo turno, empresários e políticos ligados ao PL publicaram defesas de demitir quem votou em Lula. O Ministério Público do Trabalho contou mais de 3.080 denúncias de assédio eleitoral em 2026, 1.147 delas nas 72 horas seguintes ao segundo turno, e pediu R$ 50 milhões por danos morais coletivos. O juiz Bruno José Perusso, da 77ª Vara do Trabalho de São Paulo, concedeu a liminar em 29/10.",
+    "por_que_importa": "Define até onde vai a liberdade de opinar nas redes quando a mensagem incentiva punir trabalhadores pelo voto. A decisão vale para Instagram, Facebook e Threads em todo o país.",
+    "lei": "A Constituição diz que ninguém será privado de direitos por convicção política (CF, art. 5º, VIII). A Lei 9.029/1995 proíbe discriminação no acesso e na manutenção do emprego e lista motivos como sexo, raça e idade, terminando com \"entre outros\" (art. 1º). Coagir alguém a votar ou não votar com violência ou grave ameaça já é crime eleitoral (Código Eleitoral, art. 301). O projeto do PT, PL 5.689/2026, criaria um crime específico, com pena de 2 a 5 anos e de 3 a 6 nos casos mais graves.",
+    "lados": {
+     "rotulo_a": "Quem apoia a decisão e o projeto",
+     "a": "O juiz escreveu que opinar sobre política é diferente de usar as redes para instigar a punição de trabalhadores. Para o MPT, o salto das denúncias mostra que a proteção atual não basta.",
+     "rotulo_b": "Quem vê excesso",
+     "b": "O argumento costuma ser que a decisão remove opiniões das redes e que um novo crime, com pena alta, pode ser usado contra a liberdade de expressão. O empregador também pode demitir sem dizer o motivo, o que dificulta provar a discriminação."
+    },
+    "o_que_vem": "A Meta pode recorrer. O pedido de indenização será julgado no fim da ação. O projeto começa a tramitar na Câmara.",
+    "fontes": [
+     {
+      "nome": "Lei 9.029/1995",
+      "url": "https://normas.leg.br/?urn=urn:lex:br:federal:lei:1995-04-13;9029"
+     }
+    ]
+   }
+  },
+  {
+   "assunto": "STF",
+   "titulo": "Fachin devolve caso dos descontos do INSS a Mendonça e arquiva mais cinco frentes do inquérito das fake news",
+   "temas": [
+    "Trabalho, emprego e previdência"
+   ],
+   "resumo": "O presidente do STF manteve sob sua guarda as investigações do Banco Master, que citam ministros da Corte. Os arquivamentos atenderam a pedidos da Procuradoria-Geral da República.",
+   "fontes": [
+    {
+     "nome": "Agência Brasil, 29/10",
+     "url": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-10/fachin-arquiva-mais-cinco-investigacoes-do-inquerito-das-fake-news"
+    },
+    {
+     "nome": "Poder360, 29/10",
+     "url": "https://www.poder360.com.br/poder-justica/fachin-devolve-investigacao-dos-descontos-do-inss-a-mendonca/"
+    },
+    {
+     "nome": "Gazeta do Povo, 29/10",
+     "url": "https://www.gazetadopovo.com.br/republica/fachin-devolve-inqueritos-do-inss-a-mendonca-mas-mantem-caso-master/"
+    }
+   ],
+   "explicacao": {
+    "contexto": "Em setembro, uma crise interna no STF começou depois que mensagens no celular de Daniel Vorcaro, fundador do Banco Master, mencionaram o ministro Alexandre de Moraes. Fachin tirou de Mendonça os casos do INSS e do Master e levou para a presidência o inquérito das fake news, aberto em 2019 e relatado por Moraes. Em outubro, disse que pretende arquivar o inquérito inteiro, caso a caso.",
+    "por_que_importa": "Muda quem conduz investigações sensíveis no Supremo, entre elas a dos descontos ilegais em aposentadorias do INSS, que atingem diretamente os aposentados.",
+    "lados": {
+     "rotulo_a": "Quem defendia o inquérito",
+     "a": "Ele foi aberto para apurar ataques virtuais e ameaças a ministros e às suas famílias; quem o defende diz que a Corte precisava se proteger desses ataques.",
+     "rotulo_b": "Quem critica o inquérito",
+     "b": "Juristas e a OAB criticam a duração indefinida, o objeto sem limite claro e a pouca transparência, já que grande parte das linhas de investigação é sigilosa."
+    },
+    "o_que_vem": "A decisão de Fachin vai a referendo do plenário, ainda sem data. O caso Master fica com a presidência por 90 dias contados de 12/09.",
+    "fontes": []
+   }
+  },
+  {
+   "assunto": "Economia",
+   "titulo": "Dólar sobe 0,76% e Bolsa cai pela quarta vez seguida, com o mercado à espera da equipe econômica",
+   "temas": [
+    "Impostos e contas públicas"
+   ],
+   "resumo": "O dólar fechou a R$ 5,387 e o Ibovespa terminou abaixo de 170 mil pontos. Cotado para a Fazenda, o governador do Piauí, Rafael Fonteles, negou ter tratado de cargos com Lula.",
+   "fontes": [
+    {
+     "nome": "Agência Brasil, 29/10",
+     "url": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-10/dolar-sobe-076-e-fecha-r-539-em-dia-de-cautela"
+    },
+    {
+     "nome": "CNN Brasil, 29/10",
+     "url": "https://www.cnnbrasil.com.br/politica/fonteles-nega-que-tenha-tratado-sobre-cargos-com-lula-ou-qualquer-pessoa/"
+    }
+   ],
+   "explicacao": {
+    "contexto": "Pesaram dois fatores. Lá fora, o PIB dos Estados Unidos cresceu 3,4% no terceiro trimestre, acima do esperado, e o dólar subiu frente a moedas de vários países emergentes. Aqui, o mercado aguarda quem comandará a Fazenda e qual será a política fiscal do quarto mandato de Lula.",
+    "por_que_importa": "Dólar mais caro encarece produtos importados e insumos, o que pode pressionar a inflação e, com ela, os juros.",
+    "o_que_vem": "A escolha do ministro da Fazenda e os primeiros sinais sobre as contas públicas devem orientar o mercado nas próximas semanas.",
+    "fontes": []
+   }
+  }
+ ],
+ "agenda_hoje": [
+  {
+   "hora": "",
+   "evento": "Último dia para micro e pequenas empresas escolherem como vão recolher o IBS e a CBS a partir de janeiro, com a reforma tributária",
+   "onde": "Agência Brasil"
+  },
+  {
+   "hora": "",
+   "evento": "Receita Federal paga o lote da malha fina de outubro: R$ 531,6 milhões para 184.442 contribuintes",
+   "onde": "Agência Brasil"
+  }
+ ],
+ "avisos": []
+}

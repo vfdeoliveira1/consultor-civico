@@ -8,8 +8,8 @@ Para mudar o boletim, edite este arquivo. A tarefa agendada só manda ler e segu
 
 - **Leitor:** mora em Salvador (BA). Prioridade para o governo federal e o Congresso. Bahia e Salvador entram só em um resumo curto.
 - **Período:** a semana anterior, de segunda a domingo. O `coleta.py` calcula sozinho.
-- **Formato:** página com tabelas e gráficos, relatório completo, publicada em dois lugares: no claude.ai e no site com login (branch `site`, servido pelo Cloudflare Pages; ver `site/LEIA-ME.md`). O claude.ai continua até o leitor dizer que o site basta.
-- **Endereço do site:** ainda não configurado. Quando o leitor informar, troque esta linha pelo endereço (ex.: `https://boletim.pages.dev`).
+- **Formato:** página com tabelas e gráficos, relatório completo, publicada em dois lugares: no claude.ai e no site com login (branch `site`, servido por um Worker da Cloudflare; ver `site/LEIA-ME.md`). O claude.ai continua até o leitor dizer que o site basta.
+- **Endereço do site:** ainda não configurado. Quando o leitor informar, troque esta linha pelo endereço (ex.: `https://boletim-civico.<conta>.workers.dev`).
 
 ### Deputados acompanhados
 

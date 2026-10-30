@@ -15,7 +15,8 @@ O conteúdo das leis não fica neste repositório. Ele vem do acervo público [`
 | `.mcp.json` | Servidores MCP que o Claude Code carrega ao iniciar: `senado-br` (proposições e votações do Senado) e `bcb-br` (Selic, IPCA, câmbio). O `bcb-br` tem `NODE_USE_ENV_PROXY=1` para funcionar atrás do proxy da nuvem. |
 | `setup.sh` | Instala o `ripgrep`, baixa o acervo de leis em `~/leis` e pré-instala o MCP do Banco Central. |
 | `relatorio-semanal/` | Código e instruções do Boletim Cívico (detalhes abaixo). |
-| `site/` | Modelo do site com login (Cloudflare Pages + Cloudflare Access): cabeçalhos de segurança, `robots.txt` e o roteiro de configuração em [`site/CONFIGURAR.md`](site/CONFIGURAR.md). O site publicado fica no branch `site`. |
+| `relatorio-diario/` | Código e instruções do boletim diário, a versão curta (detalhes abaixo). |
+| `site/` | Modelo do site com login (Worker da Cloudflare + Cloudflare Access): cabeçalhos de segurança, `robots.txt` e o roteiro de configuração em [`site/CONFIGURAR.md`](site/CONFIGURAR.md). O site publicado fica no branch `site`. |
 
 ## Boletim Cívico semanal
 
@@ -96,6 +97,27 @@ O levantamento de 27/10/2026 testou as 26 câmaras de capitais e a Câmara Legis
 - **Sem dados:** as outras 18. A maioria recusa conexões vindas da nuvem ou não tem dados abertos. Salvador fica de fora porque o sistema legislativo só tem endereço numérico, que a rede do ambiente não permite liberar. O motivo de cada uma está em `SEM_COBERTURA`, em `capitais.py`.
 
 Quando uma câmara passar a responder, acrescente-a em `CAPITAIS_SAPL` e libere o domínio na rede do ambiente. Se ela deixar de responder, mova-a para `SEM_COBERTURA`.
+
+## Boletim Cívico diário
+
+A versão curta do boletim, para ler em poucos minutos. Uma tarefa agendada no claude.ai roda **todo dia às 6h47** (horário de Brasília). Cada edição cobre o dia anterior e é republicada na mesma página: https://claude.ai/artifact/LpjDfH8eiBUkSXKt2RSwpH. As edições antigas ficam no histórico de versões dela.
+
+Cada edição traz:
+- **Indicadores do dia:** meta Selic, dólar com a variação no dia, IPCA em 12 meses e a expectativa de inflação do Focus.
+- **As notícias de ontem:** de 4 a 6, da mais para a menos importante, confirmadas em veículos de linhas editoriais diferentes ou em fonte oficial. Cada uma tem a caixa **"Entenda o que está em jogo"**, que abre ao clicar e explica o contexto, por que importa, o que diz a lei, como cada lado vê e o que vem agora. As notícias dos temas de `temas.json` ganham a marca "Seu tema".
+- **Votações de ontem** nos plenários da Câmara e do Senado, com o resultado.
+- **Hoje:** a pauta do plenário da Câmara e o que mais estiver marcado.
+
+O passo a passo e os critérios de escolha das notícias estão em [`relatorio-diario/INSTRUCOES.md`](relatorio-diario/INSTRUCOES.md).
+
+| Arquivo | Para que serve |
+|---|---|
+| `INSTRUCOES.md` | Configuração, passo a passo e regras das notícias e das explicações. |
+| `coleta.py` | Indicadores, votações de ontem e pauta de hoje, reaproveitando o `coleta.py` do semanal. |
+| `ler.py` | Baixa uma reportagem e imprime título, data de publicação e texto, para conferir cada notícia. |
+| `montar.py` | Junta os dados e o conteúdo no `modelo.html`. |
+| `modelo.html` | A página do diário. |
+| `exemplo.json` | Formato do conteúdo, com a edição de 29/10/2026. |
 
 ## Uso no claude.ai/code (nuvem)
 
